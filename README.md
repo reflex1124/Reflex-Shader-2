@@ -1,7 +1,7 @@
 ![Header](images/ReflexShader_h@2x.png)
 
 # Reflex Shader 2
-This shader is made for VRChat.
+This shader is made for VRChat.  
 このシェーダーはVRChatにおいて利用されることを前提に開発されています。
 
 ## Files / ファイル一覧
@@ -19,9 +19,9 @@ This shader is made for VRChat.
 - README.md (このファイル)
 
 ## Lisence / ライセンス
-当シェーダーはMITライセンスに基づき配布されています。
+当シェーダーはMITライセンスに基づき配布されています。  
 MITライセンスに基づき、再配布、商用利用、改変等すべて許可しています。
 
 ## Contact / 連絡先
-Twitter : @reflex_1124
+Twitter : @reflex_1124  
 VRChat : reflex1124
