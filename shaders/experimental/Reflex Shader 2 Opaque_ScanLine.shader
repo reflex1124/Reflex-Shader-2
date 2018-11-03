@@ -65,7 +65,7 @@ Shader "ReflexShaders/experimental/Reflex Shader 2 Opaque_ScanLine"
 			float outlineVar = ( (0.0 + (_OutlineWidth - 0.0) * (0.002 - 0.0) / (1.0 - 0.0)) * tex2Dlod( _OutlineMask, float4( uv_OutlineMask389_g12, 0, 0.0) ) ).r;
 			v.vertex.xyz += ( v.normal * outlineVar );
 		}
-		inline half4 LightingOutline( SurfaceOutput s, half3 lightDir, half atten ) { return half4 ( 0,0,0, s.Alpha); }
+		inline half4 LightingOutline( SurfaceOutput s, half3 lightDir, half atten ) { return half4 ( 0,0,0,1); }
 		void outlineSurf( Input i, inout SurfaceOutput o )
 		{
 			float2 uv_MainTex = i.uv_texcoord * _MainTex_ST.xy + _MainTex_ST.zw;
