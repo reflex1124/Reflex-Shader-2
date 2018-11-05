@@ -24,6 +24,7 @@ Shader "ReflexShaders/ReflexShader_2_Cutout"
 		_RimLightContrast("RimLight Contrast", Range( 0 , 10)) = 3
 		[NoScaleOffset]_RimLightMask("RimLight Mask", 2D) = "white" {}
 		[Toggle]_RimLightNormal("RimLight Normal", Float) = 0
+		[Toggle]_OutlineToggle("Outline Toggle", Float) = 1
 		_OutlineWidth("Outline Width", Range( 0 , 1)) = 0
 		_OutlineColor("Outline Color", Color) = (0.2941176,0.2941176,0.2941176,1)
 		[NoScaleOffset]_OutlineMask("Outline Mask", 2D) = "white" {}
@@ -39,15 +40,27 @@ Shader "ReflexShaders/ReflexShader_2_Cutout"
 		_NormalIntensity("Normal Intensity", Range( 0 , 1)) = 0.5
 		[NoScaleOffset]_ShadowMask("Shadow Mask", 2D) = "white" {}
 		_VDirLight("V Dir Light", Vector) = (0,0.6,1,0)
+		[NoScaleOffset]_EmissiveScrollTex("Emissive Scroll Tex", 2D) = "black" {}
+		[NoScaleOffset]_EmissiveScrollMask("Emissive Scroll Mask", 2D) = "white" {}
+		_EmissiveScrollColor("Emissive Scroll Color", Color) = (1,1,1,1)
+		_EmissiveScrollSpeed("Emissive Scroll Speed", Vector) = (1,0,0,0)
+		_EmissiveScrollTiling("Emissive Scroll Tiling", Float) = 1
+		[Toggle]_ScanLineToggle("Scan Line Toggle", Float) = 0
+		[NoScaleOffset]_ScanLineTex("Scan Line Tex", 2D) = "white" {}
+		_ScanLineColor("Scan Line Color", Color) = (0,0.710345,1,0)
+		_ScanLinePosition("Scan Line Position", Float) = 0
+		_ScanLineWidth("Scan Line Width", Range( 0 , 1)) = 0.1
+		_ScanLineSpeed("Scan Line Speed", Float) = 1
 		_CullMode("Cull Mode", Float) = 2
 		_CutoutThreshold("Cutout Threshold", Range( 0 , 1)) = 0.5
+		[Toggle]_EmissiveScrollToggle("Emissive Scroll Toggle", Float) = 0
 		[HideInInspector] _texcoord( "", 2D ) = "white" {}
 		[HideInInspector] __dirty( "", Int ) = 1
 	}
 
 	SubShader
 	{
-		Tags{ }
+		Tags{ "RenderType" = "TransparentCutout"  "Queue" = "AlphaTest+0"}
 		Cull Front
 		CGPROGRAM
 		#pragma target 3.0
@@ -59,7 +72,7 @@ Shader "ReflexShaders/ReflexShader_2_Cutout"
 			float outlineVar = ( (0.0 + (_OutlineWidth - 0.0) * (0.002 - 0.0) / (1.0 - 0.0)) * tex2Dlod( _OutlineMask, float4( uv_OutlineMask389_g17, 0, 0.0) ) ).r;
 			v.vertex.xyz += ( v.normal * outlineVar );
 		}
-		inline half4 LightingOutline( SurfaceOutput s, half3 lightDir, half atten ) { return half4 ( 0,0,0, s.Alpha); }
+		inline half4 LightingOutline( SurfaceOutput s, half3 lightDir, half atten ) { return half4 ( 0,0,0,1); }
 		void outlineSurf( Input i, inout SurfaceOutput o )
 		{
 			float2 uv_MainTex = i.uv_texcoord * _MainTex_ST.xy + _MainTex_ST.zw;
@@ -143,6 +156,7 @@ Shader "ReflexShaders/ReflexShader_2_Cutout"
 			float4 lerpResult372_g17 = lerp( float4( 1,1,1,1 ) , lerp(float4( 1,1,1,1 ),lerpResult368_g17,_HalfLambertToggle) , tex2D( _ShadowMask, uv_ShadowMask369_g17 ));
 			float4 Shadow375_g17 = lerpResult372_g17;
 			o.Emission = ( float4( ( (Diffuse105_g17).rgb * appendResult387_g17 ) , 0.0 ) * Lighting201_g17 * Shadow375_g17 ).rgb;
+			clip( lerp(0.0,(Diffuse105_g17).a,_OutlineToggle) - _CutoutThreshold );
 			o.Normal = float3(0,0,-1);
 		}
 		ENDCG
@@ -167,9 +181,9 @@ Shader "ReflexShaders/ReflexShader_2_Cutout"
 		struct Input
 		{
 			float2 uv_texcoord;
+			float3 worldPos;
 			float3 worldNormal;
 			INTERNAL_DATA
-			float3 worldPos;
 		};
 
 		struct SurfaceOutputCustomLightingCustom
@@ -187,9 +201,21 @@ Shader "ReflexShaders/ReflexShader_2_Cutout"
 
 		uniform float _CutoutThreshold;
 		uniform float _CullMode;
+		uniform float _ScanLineToggle;
+		uniform sampler2D _ScanLineTex;
+		uniform float _ScanLinePosition;
+		uniform float _ScanLineSpeed;
+		uniform float _ScanLineWidth;
+		uniform float4 _ScanLineColor;
+		uniform float _EmissiveScrollToggle;
 		uniform sampler2D _EmissionMap;
 		uniform float4 _EmissionMap_ST;
 		uniform float4 _EmissionColor;
+		uniform sampler2D _EmissiveScrollTex;
+		uniform float _EmissiveScrollTiling;
+		uniform float2 _EmissiveScrollSpeed;
+		uniform sampler2D _EmissiveScrollMask;
+		uniform float4 _EmissiveScrollColor;
 		uniform sampler2D _MainTex;
 		uniform float4 _MainTex_ST;
 		uniform float4 _DiffuseColor;
@@ -225,6 +251,7 @@ Shader "ReflexShaders/ReflexShader_2_Cutout"
 		uniform float _OutlineWidth;
 		uniform sampler2D _OutlineMask;
 		uniform float4 _OutlineColor;
+		uniform float _OutlineToggle;
 
 
 		float3 Function_ShadeSH9(  )
@@ -330,32 +357,32 @@ Shader "ReflexShaders/ReflexShader_2_Cutout"
 			else
 				ifLocalVar431_g17 = lerp(temp_output_335_0_g17,saturate( ( temp_output_335_0_g17 * ase_lightAtten ) ),_ObjectShadow);
 			float temp_output_351_0_g17 = ( ( ( ( _Shadow1Place + ifLocalVar431_g17 ) - 0.5 ) * _HalfLambertContrast ) + 0.5 );
-			float4 temp_cast_12 = (temp_output_351_0_g17).xxxx;
-			float div354_g17=256.0/float((int)255.0);
-			float4 posterize354_g17 = ( floor( temp_cast_12 * div354_g17 ) / div354_g17 );
 			float4 temp_cast_13 = (temp_output_351_0_g17).xxxx;
+			float div354_g17=256.0/float((int)255.0);
+			float4 posterize354_g17 = ( floor( temp_cast_13 * div354_g17 ) / div354_g17 );
+			float4 temp_cast_14 = (temp_output_351_0_g17).xxxx;
 			float4 ifLocalVar358_g17 = 0;
 			if( lerp(0.0,1.0,_PosterizeToggle) >= 0.5 )
 				ifLocalVar358_g17 = posterize354_g17;
 			else
-				ifLocalVar358_g17 = temp_cast_13;
-			float4 temp_cast_14 = (_ShadowDarknessMin).xxxx;
-			float4 temp_cast_15 = (1.0).xxxx;
-			float4 clampResult364_g17 = clamp( ifLocalVar358_g17 , temp_cast_14 , temp_cast_15 );
+				ifLocalVar358_g17 = temp_cast_14;
+			float4 temp_cast_15 = (_ShadowDarknessMin).xxxx;
+			float4 temp_cast_16 = (1.0).xxxx;
+			float4 clampResult364_g17 = clamp( ifLocalVar358_g17 , temp_cast_15 , temp_cast_16 );
 			float4 lerpResult366_g17 = lerp( _Shadow1Color , float4( 1,1,1,0 ) , clampResult364_g17);
 			float temp_output_353_0_g17 = ( ( ( ( _Shadow2Place + ifLocalVar431_g17 ) - 0.5 ) * _HalfLambertContrast ) + 0.5 );
-			float4 temp_cast_17 = (temp_output_353_0_g17).xxxx;
-			float div356_g17=256.0/float((int)255.0);
-			float4 posterize356_g17 = ( floor( temp_cast_17 * div356_g17 ) / div356_g17 );
 			float4 temp_cast_18 = (temp_output_353_0_g17).xxxx;
+			float div356_g17=256.0/float((int)255.0);
+			float4 posterize356_g17 = ( floor( temp_cast_18 * div356_g17 ) / div356_g17 );
+			float4 temp_cast_19 = (temp_output_353_0_g17).xxxx;
 			float4 ifLocalVar360_g17 = 0;
 			if( lerp(0.0,1.0,_PosterizeToggle) >= 0.5 )
 				ifLocalVar360_g17 = posterize356_g17;
 			else
-				ifLocalVar360_g17 = temp_cast_18;
-			float4 temp_cast_19 = (_ShadowDarknessMin).xxxx;
-			float4 temp_cast_20 = (1.0).xxxx;
-			float4 clampResult363_g17 = clamp( ifLocalVar360_g17 , temp_cast_19 , temp_cast_20 );
+				ifLocalVar360_g17 = temp_cast_19;
+			float4 temp_cast_20 = (_ShadowDarknessMin).xxxx;
+			float4 temp_cast_21 = (1.0).xxxx;
+			float4 clampResult363_g17 = clamp( ifLocalVar360_g17 , temp_cast_20 , temp_cast_21 );
 			float4 lerpResult368_g17 = lerp( ( saturate( min( blendOpSrc365_g17 , blendOpDest365_g17 ) )) , lerpResult366_g17 , clampResult363_g17);
 			float2 uv_ShadowMask369_g17 = i.uv_texcoord;
 			float4 lerpResult372_g17 = lerp( float4( 1,1,1,1 ) , lerp(float4( 1,1,1,1 ),lerpResult368_g17,_HalfLambertToggle) , tex2D( _ShadowMask, uv_ShadowMask369_g17 ));
@@ -375,8 +402,16 @@ Shader "ReflexShaders/ReflexShader_2_Cutout"
 		{
 			o.SurfInput = i;
 			o.Normal = float3(0,0,1);
+			float2 uv_ScanLineTex14_g15 = i.uv_texcoord;
+			float3 ase_worldPos = i.worldPos;
+			float3 objToWorld9_g15 = mul( unity_ObjectToWorld, float4( float3( 0,0,0 ), 1 ) ).xyz;
+			float lerpResult11_g15 = lerp( 0.0 ,  ( tex2D( _ScanLineTex, uv_ScanLineTex14_g15 ).r - 0.0 > 0.1 ? 1.0 : tex2D( _ScanLineTex, uv_ScanLineTex14_g15 ).r - 0.0 <= 0.1 && tex2D( _ScanLineTex, uv_ScanLineTex14_g15 ).r + 0.0 >= 0.1 ? 0.0 : 0.0 )  ,  ( ( ( ase_worldPos.y - objToWorld9_g15.y ) + _ScanLinePosition ) - (0.0 + (_ScanLineWidth - 0.0) * (0.1 - 0.0) / (1.0 - 0.0)) > ( (0.0 + (frac( ( ( _Time.y / 3.0 ) * _ScanLineSpeed ) ) - 0.0) * (2.0 - 0.0) / (1.0 - 0.0)) - 1.0 ) ? 0.0 : ( ( ase_worldPos.y - objToWorld9_g15.y ) + _ScanLinePosition ) - (0.0 + (_ScanLineWidth - 0.0) * (0.1 - 0.0) / (1.0 - 0.0)) <= ( (0.0 + (frac( ( ( _Time.y / 3.0 ) * _ScanLineSpeed ) ) - 0.0) * (2.0 - 0.0) / (1.0 - 0.0)) - 1.0 ) && ( ( ase_worldPos.y - objToWorld9_g15.y ) + _ScanLinePosition ) + (0.0 + (_ScanLineWidth - 0.0) * (0.1 - 0.0) / (1.0 - 0.0)) >= ( (0.0 + (frac( ( ( _Time.y / 3.0 ) * _ScanLineSpeed ) ) - 0.0) * (2.0 - 0.0) / (1.0 - 0.0)) - 1.0 ) ? 1.0 : 0.0 ) );
 			float2 uv_EmissionMap = i.uv_texcoord * _EmissionMap_ST.xy + _EmissionMap_ST.zw;
-			o.Emission = ( tex2D( _EmissionMap, uv_EmissionMap ) * _EmissionColor ).rgb;
+			float2 temp_cast_0 = (_EmissiveScrollTiling).xx;
+			float2 uv_TexCoord1_g16 = i.uv_texcoord * temp_cast_0 + ( _Time.x * _EmissiveScrollSpeed );
+			float2 uv_EmissiveScrollMask5_g16 = i.uv_texcoord;
+			float4 lerpResult6_g16 = lerp( float4( 0,0,0,0 ) , tex2D( _EmissiveScrollTex, uv_TexCoord1_g16 ) , tex2D( _EmissiveScrollMask, uv_EmissiveScrollMask5_g16 ));
+			o.Emission = ( lerp(float4( 0,0,0,0 ),( lerpResult11_g15 * _ScanLineColor ),_ScanLineToggle) + lerp(( tex2D( _EmissionMap, uv_EmissionMap ) * _EmissionColor ),( lerpResult6_g16 * _EmissiveScrollColor ),_EmissiveScrollToggle) ).rgb;
 		}
 
 		ENDCG
@@ -469,18 +504,27 @@ Shader "ReflexShaders/ReflexShader_2_Cutout"
 }
 /*ASEBEGIN
 Version=15800
-759;100;1161;908;699.4376;386.3588;1;False;False
-Node;AmplifyShaderEditor.CommentaryNode;46;-575.1066,-252.8279;Float;False;354.991;331.938;Properties;2;48;47;Miscellaneous;0.5514706,0.5514706,0.5514706,1;0;0
+864;92;1056;926;783.8734;211.2251;1;True;False
 Node;AmplifyShaderEditor.FunctionNode;81;-648.8154,144.081;Float;False;Reflex Shader Function;0;;17;f5d8f584674c8984ab029c8868eb5bf3;0;0;6;COLOR;186;FLOAT;265;COLOR;0;COLOR;402;FLOAT;403;COLOR;404
-Node;AmplifyShaderEditor.RangedFloatNode;47;-535.4156,-93.45108;Float;False;Property;_CutoutThreshold;Cutout Threshold;48;0;Create;True;0;0;True;0;0.5;0.5;0;1;0;1;FLOAT;0
-Node;AmplifyShaderEditor.OutlineNode;31;-300.7683,301.7381;Float;False;0;True;None;0;0;Front;3;0;FLOAT3;0,0,0;False;2;FLOAT;0;False;1;FLOAT;0;False;1;FLOAT3;0
-Node;AmplifyShaderEditor.RangedFloatNode;48;-537.1066,-180.828;Float;False;Property;_CullMode;Cull Mode;47;0;Create;True;0;0;True;0;2;0;0;0;0;1;FLOAT;0
-Node;AmplifyShaderEditor.StandardSurfaceOutputNode;0;0,0;Float;False;True;2;Float;ASEMaterialInspector;0;0;CustomLighting;ReflexShaders/ReflexShader_2_Cutout;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;Back;0;False;-1;0;False;-1;False;0;False;-1;0;False;-1;False;0;Masked;0.5;True;True;0;False;TransparentCutout;;AlphaTest;ForwardOnly;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;0;False;-1;False;0;False;-1;255;False;-1;255;False;-1;0;False;-1;0;False;-1;0;False;-1;0;False;-1;0;False;-1;0;False;-1;0;False;-1;0;False;-1;False;2;15;10;25;False;0.5;True;0;0;False;-1;0;False;-1;0;0;False;-1;0;False;-1;0;False;-1;0;False;-1;0;False;0;0,0,0,0;VertexOffset;True;False;Cylindrical;False;Relative;0;;-1;-1;-1;-1;0;False;0;0;True;48;-1;0;True;47;0;0;0;15;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0,0,0;False;4;FLOAT;0;False;6;FLOAT3;0,0,0;False;7;FLOAT3;0,0,0;False;8;FLOAT;0;False;9;FLOAT;0;False;10;FLOAT;0;False;13;FLOAT3;0,0,0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;14;FLOAT4;0,0,0,0;False;15;FLOAT3;0,0,0;False;0
+Node;AmplifyShaderEditor.FunctionNode;86;-373.3261,134.5062;Float;False;Emssion Scroll;47;;16;9b78b9ac6e341874bbeda30217ba5cd3;0;0;1;COLOR;0
+Node;AmplifyShaderEditor.CommentaryNode;46;-79.10663,-546.8279;Float;False;354.991;331.938;Properties;2;48;47;Miscellaneous;0.5514706,0.5514706,0.5514706,1;0;0
+Node;AmplifyShaderEditor.FunctionNode;83;-128.4634,32.40059;Float;False;ScanLine;53;;15;0fb2a25cfd9dc8546a406446b3d4841a;0;0;1;COLOR;0
+Node;AmplifyShaderEditor.ToggleSwitchNode;84;-153.4807,106.0266;Float;False;Property;_EmissiveScrollToggle;Emissive Scroll Toggle;62;0;Create;True;0;0;False;0;0;2;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;1;COLOR;0
+Node;AmplifyShaderEditor.RangedFloatNode;48;-41.10663,-474.828;Float;False;Property;_CullMode;Cull Mode;60;0;Create;True;0;0;True;0;2;0;0;0;0;1;FLOAT;0
+Node;AmplifyShaderEditor.OutlineNode;31;-193.8771,301.7381;Float;False;0;True;Masked;0;0;Front;3;0;FLOAT3;0,0,0;False;2;FLOAT;0;False;1;FLOAT;0;False;1;FLOAT3;0
+Node;AmplifyShaderEditor.SimpleAddOpNode;85;145.9895,33.43863;Float;False;2;2;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;1;COLOR;0
+Node;AmplifyShaderEditor.RangedFloatNode;47;-39.41559,-387.4511;Float;False;Property;_CutoutThreshold;Cutout Threshold;61;0;Create;True;0;0;True;0;0.5;0.5;0;1;0;1;FLOAT;0
+Node;AmplifyShaderEditor.StandardSurfaceOutputNode;0;324,-10;Float;False;True;2;Float;ASEMaterialInspector;0;0;CustomLighting;ReflexShaders/ReflexShader_2_Cutout;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;Back;0;False;-1;0;False;-1;False;0;False;-1;0;False;-1;False;0;Masked;0.5;True;True;0;False;TransparentCutout;;AlphaTest;ForwardOnly;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;0;False;-1;False;0;False;-1;255;False;-1;255;False;-1;0;False;-1;0;False;-1;0;False;-1;0;False;-1;0;False;-1;0;False;-1;0;False;-1;0;False;-1;False;2;15;10;25;False;0.5;True;0;0;False;-1;0;False;-1;0;0;False;-1;0;False;-1;0;False;-1;0;False;-1;0;False;0;0,0,0,0;VertexOffset;True;False;Cylindrical;False;Relative;0;;-1;-1;-1;-1;0;False;0;0;True;48;-1;0;True;47;0;0;0;15;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0,0,0;False;4;FLOAT;0;False;6;FLOAT3;0,0,0;False;7;FLOAT3;0,0,0;False;8;FLOAT;0;False;9;FLOAT;0;False;10;FLOAT;0;False;13;FLOAT3;0,0,0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;14;FLOAT4;0,0,0,0;False;15;FLOAT3;0,0,0;False;0
+WireConnection;84;0;81;186
+WireConnection;84;1;86;0
 WireConnection;31;0;81;402
+WireConnection;31;2;81;403
 WireConnection;31;1;81;404
-WireConnection;0;2;81;186
+WireConnection;85;0;83;0
+WireConnection;85;1;84;0
+WireConnection;0;2;85;0
 WireConnection;0;10;81;265
 WireConnection;0;13;81;0
 WireConnection;0;11;31;0
 ASEEND*/
-//CHKSM=07270B4FC2139F7D400ABDF0DDB84706946D05A1
+//CHKSM=B1D821591A3F7B9E804CC9F465E6CD0D8F14AD69
