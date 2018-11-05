@@ -4,7 +4,6 @@ Shader "ReflexShaders/Stencil/Reader"
 {
 	Properties
 	{
-		_Cutoff( "Mask Clip Value", Float ) = 0.5
 		_MainTex("Diffuse", 2D) = "white" {}
 		_DiffuseColor("Diffuse Color", Color) = (1,1,1,1)
 		_EmissionMap("Emission", 2D) = "black" {}
@@ -40,7 +39,7 @@ Shader "ReflexShaders/Stencil/Reader"
 		_NormalIntensity("Normal Intensity", Range( 0 , 1)) = 0.5
 		[NoScaleOffset]_ShadowMask("Shadow Mask", 2D) = "white" {}
 		_VDirLight("V Dir Light", Vector) = (0,0.6,1,0)
-		_StencilReference("Stencil Reference", Float) = 0
+		_Cutoff( "Mask Clip Value", Float ) = 0.5
 		[Toggle]_ScanLineToggle("Scan Line Toggle", Float) = 0
 		[NoScaleOffset]_ScanLineTex("Scan Line Tex", 2D) = "white" {}
 		_ScanLineColor("Scan Line Color", Color) = (0,0.710345,1,0)
@@ -58,27 +57,22 @@ Shader "ReflexShaders/Stencil/Reader"
 		_Strength("Strength", Float) = 0
 		[Toggle]_ForceEmissiveToogle("Force Emissive Toogle", Float) = 0
 		_CullMode("Cull Mode", Float) = 2
+		_StencilReference("Stencil Reference", Float) = 0
 		[HideInInspector] _texcoord( "", 2D ) = "white" {}
 		[HideInInspector] __dirty( "", Int ) = 1
 	}
 
 	SubShader
 	{
-		Pass
-		{
-			ColorMask 0
-			ZWrite On
-		}
-
 		Tags{ }
 		Cull Front
-
 		Stencil
 		{
-			Ref 5
+			Ref [_StencilReference]
 			Comp NotEqual
 			Pass Keep
 		}
+
 		CGPROGRAM
 		#pragma target 3.0
 		#pragma surface outlineSurf Outline nofog  keepalpha noshadow noambient novertexlights nolightmap nodynlightmap nodirlightmap nometa noforwardadd vertex:outlineVertexDataFunc 
@@ -178,11 +172,11 @@ Shader "ReflexShaders/Stencil/Reader"
 		ENDCG
 		
 
-		Tags{ "RenderType" = "TransparentCutout"  "Queue" = "Geometry+0" "IsEmissive" = "true"  }
+		Tags{ "RenderType" = "TransparentCutout"  "Queue" = "AlphaTest+1" "IsEmissive" = "true"  }
 		Cull Back
 		Stencil
 		{
-			Ref 5
+			Ref [_StencilReference]
 			Comp NotEqual
 			Pass Keep
 		}
@@ -458,6 +452,13 @@ Shader "ReflexShaders/Stencil/Reader"
 			Name "ShadowCaster"
 			Tags{ "LightMode" = "ShadowCaster" }
 			ZWrite On
+			Stencil
+			{
+				Ref [_StencilReference]
+				Comp NotEqual
+				Pass Keep
+			}
+			
 			CGPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
@@ -538,38 +539,38 @@ Shader "ReflexShaders/Stencil/Reader"
 }
 /*ASEBEGIN
 Version=15800
-1440;545;480;473;710.8473;-195.9225;1;True;False
-Node;AmplifyShaderEditor.FunctionNode;229;-869.2191,133.929;Float;False;Reflex Shader Function;1;;1;f5d8f584674c8984ab029c8868eb5bf3;0;0;6;COLOR;186;FLOAT;265;COLOR;0;COLOR;402;FLOAT;403;COLOR;404
-Node;AmplifyShaderEditor.FunctionNode;217;-594.8848,86.17134;Float;False;Emssion Scroll;63;;63;9b78b9ac6e341874bbeda30217ba5cd3;0;0;2;COLOR;0;COLOR;14
-Node;AmplifyShaderEditor.ToggleSwitchNode;166;-341.0156,58.03876;Float;False;Property;_EmissiveScrollToggle;Emissive Scroll Toggle;62;0;Create;True;0;0;False;0;0;2;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;1;COLOR;0
-Node;AmplifyShaderEditor.CommentaryNode;46;69.28168,-267.6262;Float;False;266.991;191.938;Properties;1;48;Miscellaneous;0.5514706,0.5514706,0.5514706,1;0;0
-Node;AmplifyShaderEditor.ToggleSwitchNode;179;-302.3478,217.2577;Float;False;Property;_ForceEmissiveToogle;Force Emissive Toogle;75;0;Create;True;0;0;False;0;0;2;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;1;COLOR;0
-Node;AmplifyShaderEditor.FunctionNode;177;-315.9983,-15.58722;Float;False;ScanLine;55;;64;0fb2a25cfd9dc8546a406446b3d4841a;0;0;1;COLOR;0
+1440;383;480;635;1730.265;611.4652;2.769188;True;False
+Node;AmplifyShaderEditor.FunctionNode;217;-594.8848,86.17134;Float;False;Emssion Scroll;56;;63;9b78b9ac6e341874bbeda30217ba5cd3;0;0;2;COLOR;0;COLOR;14
+Node;AmplifyShaderEditor.FunctionNode;229;-869.2191,133.929;Float;False;Reflex Shader Function;0;;1;f5d8f584674c8984ab029c8868eb5bf3;0;0;6;COLOR;186;FLOAT;265;COLOR;0;COLOR;402;FLOAT;403;COLOR;404
+Node;AmplifyShaderEditor.FunctionNode;177;-315.9983,-15.58722;Float;False;ScanLine;48;;64;0fb2a25cfd9dc8546a406446b3d4841a;0;0;1;COLOR;0
 Node;AmplifyShaderEditor.CommentaryNode;225;415.1616,-347.5059;Float;False;727.0001;345;Stencil;7;220;219;218;224;221;222;223;;1,1,1,1;0;0
-Node;AmplifyShaderEditor.RangedFloatNode;219;469.1616,-203.5059;Float;False;Property;_StencilReadMask;Stencil Read Mask;49;0;Create;True;0;0;False;0;0;0;0;0;0;1;FLOAT;0
-Node;AmplifyShaderEditor.RangedFloatNode;221;673.1616,-297.5059;Float;False;Property;_StencilComparison;Stencil Comparison;51;0;Create;True;0;0;False;0;255;0;0;0;0;1;FLOAT;0
-Node;AmplifyShaderEditor.RangedFloatNode;223;685.1616,-117.5059;Float;False;Property;_StencilFailFront;Stencil Fail Front;53;0;Create;True;0;0;False;0;0;0;0;0;0;1;FLOAT;0
-Node;AmplifyShaderEditor.OutlineNode;31;-379.7683,359.7381;Float;False;0;True;None;0;0;Front;3;0;FLOAT3;0,0,0;False;2;FLOAT;0;False;1;FLOAT;0;False;1;FLOAT3;0
-Node;AmplifyShaderEditor.RangedFloatNode;224;895.1616,-295.5059;Float;False;Property;_StencilZFailFront;Stencil Z Fail Front;54;0;Create;True;0;0;False;0;0;0;0;0;0;1;FLOAT;0
-Node;AmplifyShaderEditor.RangedFloatNode;218;465.1616,-293.5059;Float;False;Property;_StencilReference;Stencil Reference;48;0;Create;True;0;0;True;0;0;0;0;0;0;1;FLOAT;0
+Node;AmplifyShaderEditor.ToggleSwitchNode;179;-302.3478,217.2577;Float;False;Property;_ForceEmissiveToogle;Force Emissive Toogle;68;0;Create;True;0;0;False;0;0;2;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;1;COLOR;0
+Node;AmplifyShaderEditor.ToggleSwitchNode;166;-341.0156,58.03876;Float;False;Property;_EmissiveScrollToggle;Emissive Scroll Toggle;55;0;Create;True;0;0;False;0;0;2;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;1;COLOR;0
+Node;AmplifyShaderEditor.CommentaryNode;46;69.28168,-267.6262;Float;False;266.991;191.938;Properties;1;48;Miscellaneous;0.5514706,0.5514706,0.5514706,1;0;0
+Node;AmplifyShaderEditor.RangedFloatNode;222;681.1616,-209.5059;Float;False;Property;_StencilPassFront;Stencil Pass Front;74;0;Create;True;0;0;False;0;0;0;0;0;0;1;FLOAT;0
 Node;AmplifyShaderEditor.LerpOp;183;-14.34784,175.2577;Float;False;3;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;2;COLOR;0,0,0,0;False;1;COLOR;0
-Node;AmplifyShaderEditor.RangedFloatNode;222;681.1616,-209.5059;Float;False;Property;_StencilPassFront;Stencil Pass Front;52;0;Create;True;0;0;False;0;0;0;0;0;0;1;FLOAT;0
-Node;AmplifyShaderEditor.RangedFloatNode;220;469.1616,-119.5059;Float;False;Property;_StencilWriteMask;Stencil Write Mask;50;0;Create;True;0;0;False;0;255;0;0;0;0;1;FLOAT;0
-Node;AmplifyShaderEditor.RangedFloatNode;48;107.2817,-195.6262;Float;False;Property;_CullMode;Cull Mode;76;0;Create;True;0;0;True;0;2;0;0;0;0;1;FLOAT;0
+Node;AmplifyShaderEditor.RangedFloatNode;220;469.1616,-119.5059;Float;False;Property;_StencilWriteMask;Stencil Write Mask;72;0;Create;True;0;0;False;0;255;0;0;0;0;1;FLOAT;0
 Node;AmplifyShaderEditor.SimpleAddOpNode;152;-41.5454,-14.54919;Float;False;2;2;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;1;COLOR;0
-Node;AmplifyShaderEditor.StandardSurfaceOutputNode;0;150,-18;Float;False;True;2;Float;ASEMaterialInspector;0;0;CustomLighting;ReflexShaders/Stencil/Reader;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;Back;0;False;-1;0;False;-1;False;0;False;-1;0;False;-1;True;0;Custom;0.5;True;True;0;True;TransparentCutout;;Geometry;ForwardOnly;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;0;False;-1;True;5;False;218;255;False;219;255;False;220;6;False;221;1;False;222;0;False;223;0;False;224;0;False;-1;0;False;-1;0;False;-1;0;False;-1;False;2;15;10;25;False;0.5;True;0;1;False;-1;1;False;-1;0;0;False;-1;0;False;-1;0;False;-1;0;False;-1;0;False;0;0,0,0,0;VertexOffset;True;False;Cylindrical;False;Relative;0;;0;-1;-1;-1;0;False;0;0;False;48;-1;0;False;-1;0;0;0;15;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0,0,0;False;4;FLOAT;0;False;6;FLOAT3;0,0,0;False;7;FLOAT3;0,0,0;False;8;FLOAT;0;False;9;FLOAT;0;False;10;FLOAT;0;False;13;FLOAT3;0,0,0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;14;FLOAT4;0,0,0,0;False;15;FLOAT3;0,0,0;False;0
+Node;AmplifyShaderEditor.RangedFloatNode;48;107.2817,-195.6262;Float;False;Property;_CullMode;Cull Mode;69;0;Create;True;0;0;True;0;2;0;0;0;0;1;FLOAT;0
+Node;AmplifyShaderEditor.RangedFloatNode;218;465.1616,-293.5059;Float;False;Property;_StencilReference;Stencil Reference;70;0;Create;True;0;0;True;0;0;0;0;0;0;1;FLOAT;0
+Node;AmplifyShaderEditor.RangedFloatNode;221;673.1616,-297.5059;Float;False;Property;_StencilComparison;Stencil Comparison;73;0;Create;True;0;0;False;0;255;0;0;0;0;1;FLOAT;0
+Node;AmplifyShaderEditor.RangedFloatNode;219;469.1616,-203.5059;Float;False;Property;_StencilReadMask;Stencil Read Mask;71;0;Create;True;0;0;False;0;0;0;0;0;0;1;FLOAT;0
+Node;AmplifyShaderEditor.RangedFloatNode;223;685.1616,-117.5059;Float;False;Property;_StencilFailFront;Stencil Fail Front;75;0;Create;True;0;0;False;0;0;0;0;0;0;1;FLOAT;0
+Node;AmplifyShaderEditor.RangedFloatNode;224;895.1616,-295.5059;Float;False;Property;_StencilZFailFront;Stencil Z Fail Front;76;0;Create;True;0;0;False;0;0;0;0;0;0;1;FLOAT;0
+Node;AmplifyShaderEditor.OutlineNode;31;-379.7683,359.7381;Float;False;0;True;None;0;0;Front;3;0;FLOAT3;0,0,0;False;2;FLOAT;0;False;1;FLOAT;0;False;1;FLOAT3;0
+Node;AmplifyShaderEditor.StandardSurfaceOutputNode;0;150,-18;Float;False;True;2;Float;ASEMaterialInspector;0;0;CustomLighting;ReflexShaders/Stencil/Reader;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;Back;0;False;-1;0;False;-1;False;0;False;-1;0;False;-1;False;0;Masked;0.5;True;True;1;True;TransparentCutout;;AlphaTest;ForwardOnly;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;0;False;-1;True;2;True;218;255;False;219;255;False;220;6;False;221;1;False;222;0;False;223;0;False;224;0;False;-1;0;False;-1;0;False;-1;0;False;-1;False;2;15;10;25;False;0.5;True;0;5;False;-1;10;False;-1;0;1;False;-1;1;False;-1;0;False;-1;0;False;-1;0;False;0;0,0,0,0;VertexOffset;True;False;Cylindrical;False;Relative;0;;47;-1;-1;-1;0;False;0;0;False;48;-1;0;False;-1;0;0;0;15;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0,0,0;False;4;FLOAT;0;False;6;FLOAT3;0,0,0;False;7;FLOAT3;0,0,0;False;8;FLOAT;0;False;9;FLOAT;0;False;10;FLOAT;0;False;13;FLOAT3;0,0,0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;14;FLOAT4;0,0,0,0;False;15;FLOAT3;0,0,0;False;0
+WireConnection;179;1;217;14
 WireConnection;166;0;229;186
 WireConnection;166;1;217;0
-WireConnection;179;1;217;14
-WireConnection;31;0;229;402
-WireConnection;31;1;229;404
 WireConnection;183;0;229;0
 WireConnection;183;2;179;0
 WireConnection;152;0;177;0
 WireConnection;152;1;166;0
+WireConnection;31;0;229;402
+WireConnection;31;1;229;404
 WireConnection;0;2;152;0
 WireConnection;0;10;229;265
 WireConnection;0;13;183;0
 WireConnection;0;11;31;0
 ASEEND*/
-//CHKSM=D21FF48A1F6303FC2CE37C99F785076AE8640F07
+//CHKSM=1280970D5BAFA5EFC2D3946FB980BA9B3017B6D9
