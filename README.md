@@ -10,7 +10,6 @@ This shader is made for VRChat.
     - Reflex Shader Function.asset (ASE用のファンクションファイル。シェーダーの本体はここに記述してある。)
   - Reflex Shader 2 Cutout.shader (Transparent Cutoutで切り抜きたいとき用)
   - Reflex Shader 2 Opaque.shader (透過なし)
-  - Reflex Shader 2 Opaque_Fixed.shader (アウトラインがアルファになるバグを修正したもの。直接コード書き換えてあるため分けてある。)
   - Reflex Shader 2 Transparent.shader (表情等の透過用。バグが多いためマテリアルを分けて使うか使わないことを推奨。)
 - Matcap
   - Shadow 01.png (Matcap Shadowで擬似影を付けたい場合用のテクスチャ01)
