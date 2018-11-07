@@ -4,27 +4,13 @@ Shader "Reflex Shader 2/Reflex Shader 2 Cutout"
 {
 	Properties
 	{
-		[NoScaleOffset]_EmissiveScrollTex("Emissive Scroll Tex", 2D) = "black" {}
-		[Toggle]_ScanLineToggle("Scan Line Toggle", Float) = 0
-		[NoScaleOffset]_ScanLineTex("Scan Line Tex", 2D) = "white" {}
 		_MainTex("Diffuse", 2D) = "white" {}
-		[NoScaleOffset]_EmissiveScrollMask("Emissive Scroll Mask", 2D) = "white" {}
-		_EmissiveScrollColor("Emissive Scroll Color", Color) = (1,1,1,1)
-		_ScanLineColor("Scan Line Color", Color) = (0,0.710345,1,0)
 		_DiffuseColor("Diffuse Color", Color) = (1,1,1,1)
 		_EmissionMap("Emission", 2D) = "black" {}
-		_ScanLinePosition("Scan Line Position", Float) = 0
-		_EmissiveScrollSpeed("Emissive Scroll Speed", Vector) = (1,0,0,0)
-		_EmissiveScrollTiling("Emissive Scroll Tiling", Float) = 1
-		_ScanLineWidth("Scan Line Width", Range( 0 , 1)) = 1
 		_EmissionColor("Emission Color", Color) = (1,1,1,1)
-		[Toggle]_EmissiveScrollGradient("Emissive Scroll Gradient", Float) = 1
-		_ScanLineSpeed("Scan Line Speed", Float) = 1
 		[Normal]_BumpMap("Normal Map", 2D) = "bump" {}
 		[Toggle]_MatcapToggle("Matcap Toggle", Float) = 1
-		_GradientCotrast("Gradient Cotrast", Float) = 1
 		_Matcap("Matcap", 2D) = "black" {}
-		_Strength("Strength", Float) = 0
 		_MatcapColor("Matcap Color", Color) = (1,1,1,1)
 		[Toggle]_MatcapShadowToggle("Matcap Shadow Toggle", Float) = 1
 		_MatcapShadow("Matcap Shadow", 2D) = "white" {}
@@ -54,7 +40,21 @@ Shader "Reflex Shader 2/Reflex Shader 2 Cutout"
 		_NormalIntensity("Normal Intensity", Range( 0 , 1)) = 0.5
 		[NoScaleOffset]_ShadowMask("Shadow Mask", 2D) = "white" {}
 		_VDirLight("V Dir Light", Vector) = (0,0.6,1,0)
+		[Toggle]_ScanLineToggle("Scan Line Toggle", Float) = 0
+		[NoScaleOffset]_ScanLineTex("Scan Line Tex", 2D) = "white" {}
+		_ScanLineColor("Scan Line Color", Color) = (0,0.710345,1,0)
+		_ScanLineSpeed("Scan Line Speed", Float) = 1
+		_ScanLineWidth("Scan Line Width", Range( 0 , 1)) = 1
+		_ScanLinePosition("Scan Line Position", Float) = 0
 		[Toggle]_EmissiveScrollToggle("Emissive Scroll Toggle", Float) = 0
+		[NoScaleOffset]_EmissiveScrollTex("Emissive Scroll Tex", 2D) = "black" {}
+		[NoScaleOffset]_EmissiveScrollMask("Emissive Scroll Mask", 2D) = "white" {}
+		_EmissiveScrollColor("Emissive Scroll Color", Color) = (1,1,1,1)
+		_EmissiveScrollSpeed("Emissive Scroll Speed", Vector) = (1,0,0,0)
+		_EmissiveScrollTiling("Emissive Scroll Tiling", Float) = 1
+		[Toggle]_EmissiveScrollGradient("Emissive Scroll Gradient", Float) = 1
+		_EmissiveScrollContrast("Emissive Scroll Contrast", Float) = 1
+		_EmissiveScrollStrength("Emissive Scroll Strength", Float) = 0
 		[Toggle]_ForceEmissiveToogle("Force Emissive Toogle", Float) = 0
 		_CullMode("Cull Mode", Float) = 2
 		_CutoutThreshold("Cutout Threshold", Range( 0 , 1)) = 0.5
@@ -119,8 +119,8 @@ Shader "Reflex Shader 2/Reflex Shader 2 Cutout"
 			#else //aseld
 			float3 ase_worldlightDir = normalize( UnityWorldSpaceLightDir( ase_worldPos ) );
 			#endif //aseld
-			float dotResult5_g72 = dot( newWorldNormal334_g70 , ase_worldlightDir );
-			float temp_output_335_0_g70 = (dotResult5_g72*0.5 + 0.5);
+			float dotResult5_g71 = dot( newWorldNormal334_g70 , ase_worldlightDir );
+			float temp_output_335_0_g70 = (dotResult5_g71*0.5 + 0.5);
 			float4 transform434_g70 = mul(unity_ObjectToWorld,float4( _VDirLight , 0.0 ));
 			float dotResult441_g70 = dot( transform434_g70 , float4( newWorldNormal334_g70 , 0.0 ) );
 			float ifLocalVar431_g70 = 0;
@@ -203,8 +203,8 @@ Shader "Reflex Shader 2/Reflex Shader 2 Cutout"
 			UnityGIInput GIData;
 		};
 
-		uniform float _CullMode;
 		uniform float _CutoutThreshold;
+		uniform float _CullMode;
 		uniform float _ScanLineToggle;
 		uniform sampler2D _ScanLineTex;
 		uniform float _ScanLinePosition;
@@ -221,8 +221,8 @@ Shader "Reflex Shader 2/Reflex Shader 2 Cutout"
 		uniform float2 _EmissiveScrollSpeed;
 		uniform sampler2D _EmissiveScrollMask;
 		uniform float4 _EmissiveScrollColor;
-		uniform float _Strength;
-		uniform float _GradientCotrast;
+		uniform float _EmissiveScrollStrength;
+		uniform float _EmissiveScrollContrast;
 		uniform sampler2D _MainTex;
 		uniform float4 _MainTex_ST;
 		uniform float4 _DiffuseColor;
@@ -355,8 +355,8 @@ Shader "Reflex Shader 2/Reflex Shader 2 Cutout"
 			#else //aseld
 			float3 ase_worldlightDir = normalize( UnityWorldSpaceLightDir( ase_worldPos ) );
 			#endif //aseld
-			float dotResult5_g72 = dot( newWorldNormal334_g70 , ase_worldlightDir );
-			float temp_output_335_0_g70 = (dotResult5_g72*0.5 + 0.5);
+			float dotResult5_g71 = dot( newWorldNormal334_g70 , ase_worldlightDir );
+			float temp_output_335_0_g70 = (dotResult5_g71*0.5 + 0.5);
 			float4 transform434_g70 = mul(unity_ObjectToWorld,float4( _VDirLight , 0.0 ));
 			float dotResult441_g70 = dot( transform434_g70 , float4( newWorldNormal334_g70 , 0.0 ) );
 			float ifLocalVar431_g70 = 0;
@@ -395,9 +395,10 @@ Shader "Reflex Shader 2/Reflex Shader 2 Cutout"
 			float2 uv_ShadowMask369_g70 = i.uv_texcoord;
 			float4 lerpResult372_g70 = lerp( float4( 1,1,1,1 ) , lerp(float4( 1,1,1,1 ),lerpResult368_g70,_HalfLambertToggle) , tex2D( _ShadowMask, uv_ShadowMask369_g70 ));
 			float4 Shadow375_g70 = lerpResult372_g70;
-			float2 uv_EmissiveScrollMask5_g71 = i.uv_texcoord;
-			float4 tex2DNode5_g71 = tex2D( _EmissiveScrollMask, uv_EmissiveScrollMask5_g71 );
-			float4 lerpResult451_g70 = lerp( saturate( ( ( RimLight233_g70 + Matcap260_g70 ) * MatcapShadow261_g70 * Lighting201_g70 * Shadow375_g70 ) ) , float4( 0,0,0,0 ) , lerp(float4( 0,0,0,0 ),tex2DNode5_g71,_ForceEmissiveToogle));
+			float2 uv_EmissiveScrollMask466_g70 = i.uv_texcoord;
+			float4 tex2DNode466_g70 = tex2D( _EmissiveScrollMask, uv_EmissiveScrollMask466_g70 );
+			float4 EmissiveScrollMask508_g70 = tex2DNode466_g70;
+			float4 lerpResult451_g70 = lerp( saturate( ( ( RimLight233_g70 + Matcap260_g70 ) * MatcapShadow261_g70 * Lighting201_g70 * Shadow375_g70 ) ) , float4( 0,0,0,0 ) , lerp(float4( 0,0,0,0 ),EmissiveScrollMask508_g70,_ForceEmissiveToogle));
 			c.rgb = lerpResult451_g70.rgb;
 			c.a = 1;
 			clip( temp_output_84_0_g70.a - _CutoutThreshold );
@@ -413,21 +414,23 @@ Shader "Reflex Shader 2/Reflex Shader 2 Cutout"
 		{
 			o.SurfInput = i;
 			o.Normal = float3(0,0,1);
-			float2 uv_ScanLineTex14_g73 = i.uv_texcoord;
+			float2 uv_ScanLineTex526_g70 = i.uv_texcoord;
 			float3 ase_worldPos = i.worldPos;
-			float3 worldToObj29_g73 = mul( unity_WorldToObject, float4( ase_worldPos, 1 ) ).xyz;
-			float lerpResult11_g73 = lerp( 0.0 ,  ( tex2D( _ScanLineTex, uv_ScanLineTex14_g73 ).r - 0.0 > 0.1 ? 1.0 : tex2D( _ScanLineTex, uv_ScanLineTex14_g73 ).r - 0.0 <= 0.1 && tex2D( _ScanLineTex, uv_ScanLineTex14_g73 ).r + 0.0 >= 0.1 ? 0.0 : 0.0 )  ,  ( ( worldToObj29_g73.y + _ScanLinePosition ) - (0.0 + (_ScanLineWidth - 0.0) * (0.1 - 0.0) / (1.0 - 0.0)) > ( (0.0 + (frac( ( ( _Time.y / 3.0 ) * _ScanLineSpeed ) ) - 0.0) * (2.0 - 0.0) / (1.0 - 0.0)) - 1.0 ) ? 0.0 : ( worldToObj29_g73.y + _ScanLinePosition ) - (0.0 + (_ScanLineWidth - 0.0) * (0.1 - 0.0) / (1.0 - 0.0)) <= ( (0.0 + (frac( ( ( _Time.y / 3.0 ) * _ScanLineSpeed ) ) - 0.0) * (2.0 - 0.0) / (1.0 - 0.0)) - 1.0 ) && ( worldToObj29_g73.y + _ScanLinePosition ) + (0.0 + (_ScanLineWidth - 0.0) * (0.1 - 0.0) / (1.0 - 0.0)) >= ( (0.0 + (frac( ( ( _Time.y / 3.0 ) * _ScanLineSpeed ) ) - 0.0) * (2.0 - 0.0) / (1.0 - 0.0)) - 1.0 ) ? 1.0 : 0.0 ) );
+			float3 worldToObj529_g70 = mul( unity_WorldToObject, float4( ase_worldPos, 1 ) ).xyz;
+			float lerpResult513_g70 = lerp( 0.0 ,  ( tex2D( _ScanLineTex, uv_ScanLineTex526_g70 ).r - 0.0 > 0.1 ? 1.0 : tex2D( _ScanLineTex, uv_ScanLineTex526_g70 ).r - 0.0 <= 0.1 && tex2D( _ScanLineTex, uv_ScanLineTex526_g70 ).r + 0.0 >= 0.1 ? 0.0 : 0.0 )  ,  ( ( worldToObj529_g70.y + _ScanLinePosition ) - (0.0 + (_ScanLineWidth - 0.0) * (0.1 - 0.0) / (1.0 - 0.0)) > ( (0.0 + (frac( ( ( _Time.y / 3.0 ) * _ScanLineSpeed ) ) - 0.0) * (2.0 - 0.0) / (1.0 - 0.0)) - 1.0 ) ? 0.0 : ( worldToObj529_g70.y + _ScanLinePosition ) - (0.0 + (_ScanLineWidth - 0.0) * (0.1 - 0.0) / (1.0 - 0.0)) <= ( (0.0 + (frac( ( ( _Time.y / 3.0 ) * _ScanLineSpeed ) ) - 0.0) * (2.0 - 0.0) / (1.0 - 0.0)) - 1.0 ) && ( worldToObj529_g70.y + _ScanLinePosition ) + (0.0 + (_ScanLineWidth - 0.0) * (0.1 - 0.0) / (1.0 - 0.0)) >= ( (0.0 + (frac( ( ( _Time.y / 3.0 ) * _ScanLineSpeed ) ) - 0.0) * (2.0 - 0.0) / (1.0 - 0.0)) - 1.0 ) ? 1.0 : 0.0 ) );
+			float4 ScanLineEmission534_g70 = lerp(float4( 0,0,0,0 ),( lerpResult513_g70 * _ScanLineColor ),_ScanLineToggle);
 			float2 uv_EmissionMap = i.uv_texcoord * _EmissionMap_ST.xy + _EmissionMap_ST.zw;
 			float2 temp_cast_0 = (_EmissiveScrollTiling).xx;
-			float2 uv_TexCoord1_g71 = i.uv_texcoord * temp_cast_0 + ( _Time.x * _EmissiveScrollSpeed );
-			float2 uv_EmissiveScrollMask5_g71 = i.uv_texcoord;
-			float4 tex2DNode5_g71 = tex2D( _EmissiveScrollMask, uv_EmissiveScrollMask5_g71 );
-			float4 lerpResult6_g71 = lerp( float4( 0,0,0,0 ) , tex2D( _EmissiveScrollTex, uv_TexCoord1_g71 ) , tex2DNode5_g71);
-			float2 ScrollDir59_g71 = _EmissiveScrollSpeed;
-			float dotResult78_g71 = dot( i.uv_texcoord , ScrollDir59_g71 );
-			float2 break53_g71 = cos( ( UNITY_PI * ( ( dotResult78_g71 + _Time.y ) * ScrollDir59_g71 ) ) );
-			float4 lerpResult50_g71 = lerp( float4( 0,0,0,0 ) , ( _EmissiveScrollColor * ( 1.0 - saturate( ( ( ( ( ( break53_g71.x + break53_g71.y ) + _Strength ) - 0.5 ) * _GradientCotrast ) + 0.5 ) ) ) ) , tex2DNode5_g71);
-			o.Emission = ( lerp(float4( 0,0,0,0 ),( lerpResult11_g73 * _ScanLineColor ),_ScanLineToggle) + lerp(( tex2D( _EmissionMap, uv_EmissionMap ) * _EmissionColor ),saturate( lerp(( lerpResult6_g71 * _EmissiveScrollColor ),lerpResult50_g71,_EmissiveScrollGradient) ),_EmissiveScrollToggle) ).rgb;
+			float2 uv_TexCoord485_g70 = i.uv_texcoord * temp_cast_0 + ( _Time.x * _EmissiveScrollSpeed );
+			float2 uv_EmissiveScrollMask466_g70 = i.uv_texcoord;
+			float4 tex2DNode466_g70 = tex2D( _EmissiveScrollMask, uv_EmissiveScrollMask466_g70 );
+			float4 lerpResult468_g70 = lerp( float4( 0,0,0,0 ) , tex2D( _EmissiveScrollTex, uv_TexCoord485_g70 ) , tex2DNode466_g70);
+			float2 ScrollDir469_g70 = _EmissiveScrollSpeed;
+			float dotResult461_g70 = dot( i.uv_texcoord , ScrollDir469_g70 );
+			float2 break496_g70 = cos( ( UNITY_PI * ( ( dotResult461_g70 + _Time.y ) * ScrollDir469_g70 ) ) );
+			float4 lerpResult504_g70 = lerp( float4( 0,0,0,0 ) , ( _EmissiveScrollColor * ( 1.0 - saturate( ( ( ( ( ( break496_g70.x + break496_g70.y ) + _EmissiveScrollStrength ) - 0.5 ) * _EmissiveScrollContrast ) + 0.5 ) ) ) ) , tex2DNode466_g70);
+			float4 EmissiveScroll507_g70 = saturate( lerp(( lerpResult468_g70 * _EmissiveScrollColor ),lerpResult504_g70,_EmissiveScrollGradient) );
+			o.Emission = ( ScanLineEmission534_g70 + lerp(( tex2D( _EmissionMap, uv_EmissionMap ) * _EmissionColor ),EmissiveScroll507_g70,_EmissiveScrollToggle) ).rgb;
 		}
 
 		ENDCG
@@ -520,12 +523,12 @@ Shader "Reflex Shader 2/Reflex Shader 2 Cutout"
 }
 /*ASEBEGIN
 Version=15800
-819;92;1101;926;550.2584;756.1608;1.502612;False;False
-Node;AmplifyShaderEditor.FunctionNode;89;-411.4024,126.0497;Float;False;Reflex Shader Function;0;;70;f5d8f584674c8984ab029c8868eb5bf3;0;0;6;COLOR;186;FLOAT;265;COLOR;0;COLOR;402;FLOAT;403;COLOR;404
+796;92;1124;926;567.5385;756.1608;1.502612;False;False
 Node;AmplifyShaderEditor.CommentaryNode;46;338.6193,-381.5405;Float;False;354.991;331.938;Properties;2;48;47;Miscellaneous;0.5514706,0.5514706,0.5514706,1;0;0
-Node;AmplifyShaderEditor.RangedFloatNode;47;378.3102,-222.1641;Float;False;Property;_CutoutThreshold;Cutout Threshold;47;0;Create;True;0;0;True;0;0.5;0.5;0;1;0;1;FLOAT;0
+Node;AmplifyShaderEditor.FunctionNode;89;-411.4024,126.0497;Float;False;Reflex Shader Function;0;;70;f5d8f584674c8984ab029c8868eb5bf3;0;0;6;COLOR;186;FLOAT;265;COLOR;0;COLOR;402;FLOAT;403;COLOR;404
+Node;AmplifyShaderEditor.RangedFloatNode;48;376.6192,-309.541;Float;False;Property;_CullMode;Cull Mode;60;0;Create;True;0;0;True;0;2;0;0;0;0;1;FLOAT;0
 Node;AmplifyShaderEditor.OutlineNode;31;-7.553241,256.6598;Float;False;0;True;Masked;0;0;Front;3;0;FLOAT3;0,0,0;False;2;FLOAT;0;False;1;FLOAT;0;False;1;FLOAT3;0
-Node;AmplifyShaderEditor.RangedFloatNode;48;376.6192,-309.541;Float;False;Property;_CullMode;Cull Mode;46;0;Create;True;0;0;True;0;2;0;0;0;0;1;FLOAT;0
+Node;AmplifyShaderEditor.RangedFloatNode;47;378.3102,-222.1641;Float;False;Property;_CutoutThreshold;Cutout Threshold;61;0;Create;True;0;0;True;0;0.5;0.5;0;1;0;1;FLOAT;0
 Node;AmplifyShaderEditor.StandardSurfaceOutputNode;0;324,-10;Float;False;True;2;Float;ASEMaterialInspector;0;0;CustomLighting;Reflex Shader 2/Reflex Shader 2 Cutout;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;Back;0;False;-1;0;False;-1;False;0;False;-1;0;False;-1;False;0;Masked;0.5;True;True;0;False;TransparentCutout;;AlphaTest;ForwardOnly;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;0;False;-1;False;0;False;-1;255;False;-1;255;False;-1;0;False;-1;0;False;-1;0;False;-1;0;False;-1;0;False;-1;0;False;-1;0;False;-1;0;False;-1;False;2;15;10;25;False;0.5;True;0;0;False;-1;0;False;-1;0;0;False;-1;0;False;-1;0;False;-1;0;False;-1;0;False;0;0,0,0,0;VertexOffset;True;False;Cylindrical;False;Relative;0;;-1;-1;-1;-1;0;False;0;0;True;48;-1;0;True;47;0;0;0;15;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0,0,0;False;4;FLOAT;0;False;6;FLOAT3;0,0,0;False;7;FLOAT3;0,0,0;False;8;FLOAT;0;False;9;FLOAT;0;False;10;FLOAT;0;False;13;FLOAT3;0,0,0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;14;FLOAT4;0,0,0,0;False;15;FLOAT3;0,0,0;False;0
 WireConnection;31;0;89;402
 WireConnection;31;2;89;403
@@ -535,4 +538,4 @@ WireConnection;0;10;89;265
 WireConnection;0;13;89;0
 WireConnection;0;11;31;0
 ASEEND*/
-//CHKSM=A2542C32E4730B5210E6B8F3FE3793F0D2852C01
+//CHKSM=097460DEB3FB69632841A300A7AC5E0960BEECDF
