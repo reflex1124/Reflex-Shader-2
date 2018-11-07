@@ -1,4 +1,4 @@
-![Header](images/ReflexShader_h@2x.png)
+![Header](Images/ReflexShader_h@2x.png)
 
 # Reflex Shader 2
 This shader is made for VRChat.  
