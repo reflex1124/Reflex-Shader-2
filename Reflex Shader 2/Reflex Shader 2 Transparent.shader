@@ -76,7 +76,7 @@ Shader "Reflex Shader 2/Reflex Shader 2 Transparent"
 			float outlineVar = ( (0.0 + (_OutlineWidth - 0.0) * (0.002 - 0.0) / (1.0 - 0.0)) * tex2Dlod( _OutlineMask, float4( uv_OutlineMask389_g69, 0, 0.0) ) ).r;
 			v.vertex.xyz += ( v.normal * outlineVar );
 		}
-		inline half4 LightingOutline( SurfaceOutput s, half3 lightDir, half atten ) { return half4 ( 0,0,0,); }
+		inline half4 LightingOutline( SurfaceOutput s, half3 lightDir, half atten ) { return half4 ( 0,0,0,1); }
 		void outlineSurf( Input i, inout SurfaceOutput o )
 		{
 			float2 uv_MainTex = i.uv_texcoord * _MainTex_ST.xy + _MainTex_ST.zw;
@@ -524,13 +524,13 @@ Shader "Reflex Shader 2/Reflex Shader 2 Transparent"
 }
 /*ASEBEGIN
 Version=15800
-1036;92;884;926;710.2145;417.4942;1.3;True;False
-Node;AmplifyShaderEditor.CommentaryNode;46;-680.2408,-248.8545;Float;False;366.991;341.938;Properties;3;48;47;136;Miscellaneous;0.5514706,0.5514706,0.5514706,1;0;0
+1036;92;884;926;1037.814;448.6942;1.3;True;False
 Node;AmplifyShaderEditor.FunctionNode;155;-612.7683,171.738;Float;False;Reflex Shader Function;0;;69;f5d8f584674c8984ab029c8868eb5bf3;0;0;6;COLOR;186;FLOAT;265;COLOR;0;COLOR;402;FLOAT;403;COLOR;404
-Node;AmplifyShaderEditor.RangedFloatNode;47;-640.5499,-89.4776;Float;False;Property;_CutoutThreshold;Cutout Threshold;61;0;Create;True;0;0;True;0;0.5;0.5;0;1;0;1;FLOAT;0
-Node;AmplifyShaderEditor.RangedFloatNode;136;-648.3272,4.926666;Float;False;Property;_ZWriteModeOn;Z Write Mode On;62;1;[Toggle];Create;True;0;0;True;0;1;0;0;0;0;1;FLOAT;0
+Node;AmplifyShaderEditor.CommentaryNode;46;-680.2408,-248.8545;Float;False;366.991;341.938;Properties;3;48;47;136;Miscellaneous;0.5514706,0.5514706,0.5514706,1;0;0
 Node;AmplifyShaderEditor.RangedFloatNode;48;-642.2408,-176.8546;Float;False;Property;_CullMode;Cull Mode;60;0;Create;True;0;0;True;0;2;0;0;0;0;1;FLOAT;0
 Node;AmplifyShaderEditor.OutlineNode;31;-300.7683,301.7381;Float;False;0;True;None;0;0;Front;3;0;FLOAT3;0,0,0;False;2;FLOAT;0;False;1;FLOAT;0;False;1;FLOAT3;0
+Node;AmplifyShaderEditor.RangedFloatNode;47;-640.5499,-89.4776;Float;False;Property;_CutoutThreshold;Cutout Threshold;61;0;Create;True;0;0;True;0;0.5;0.5;0;1;0;1;FLOAT;0
+Node;AmplifyShaderEditor.RangedFloatNode;136;-648.3272,4.926666;Float;False;Property;_ZWriteModeOn;Z Write Mode On;62;1;[Toggle];Create;True;0;0;True;0;1;0;0;0;0;1;FLOAT;0
 Node;AmplifyShaderEditor.StandardSurfaceOutputNode;0;158,-12;Float;False;True;2;Float;;0;0;CustomLighting;Reflex Shader 2/Reflex Shader 2 Transparent;False;False;False;False;False;False;False;False;False;False;False;False;False;False;True;False;False;False;False;False;Back;0;True;136;0;False;-1;False;0;False;-1;0;False;-1;False;0;Custom;0.5;True;True;0;True;Transparent;;Transparent;ForwardOnly;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;0;False;-1;False;0;False;-1;255;False;-1;255;False;-1;0;False;-1;0;False;-1;0;False;-1;0;False;-1;0;False;-1;0;False;-1;0;False;-1;0;False;-1;False;2;15;10;25;False;0.5;True;2;5;False;-1;10;False;-1;1;5;False;-1;7;False;-1;0;False;-1;0;False;-1;0;False;0;0,0,0,0;VertexOffset;True;False;Cylindrical;False;Relative;0;;-1;-1;-1;-1;0;False;0;0;False;-1;-1;0;True;47;0;0;0;15;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0,0,0;False;4;FLOAT;0;False;6;FLOAT3;0,0,0;False;7;FLOAT3;0,0,0;False;8;FLOAT;0;False;9;FLOAT;0;False;10;FLOAT;0;False;13;FLOAT3;0,0,0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;14;FLOAT4;0,0,0,0;False;15;FLOAT3;0,0,0;False;0
 WireConnection;31;0;155;402
 WireConnection;31;1;155;404
@@ -539,4 +539,4 @@ WireConnection;0;9;155;265
 WireConnection;0;13;155;0
 WireConnection;0;11;31;0
 ASEEND*/
-//CHKSM=6DB120625C90EE73A883119032A7694CAB02B246
+//CHKSM=2B7F42665BC265CD3505D1EA5ED0DB962513E23D
