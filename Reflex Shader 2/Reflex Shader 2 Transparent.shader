@@ -53,7 +53,7 @@ Shader "Reflex Shader 2/Reflex Shader 2 Transparent"
 		[Toggle]_EmissiveScrollGradient("Emissive Scroll Gradient", Float) = 1
 		_EmissiveScrollContrast("Emissive Scroll Contrast", Float) = 1
 		_EmissiveScrollStrength("Emissive Scroll Strength", Float) = 0
-		[Toggle]_ForceEmissiveToogle("Force Emissive Toogle", Float) = 0
+		[Toggle]_ForceEmissivetoggle("Force Emissive toggle", Float) = 0
 		_EmissiveScrollTiling("Emissive Scroll Tiling", Vector) = (1,1,0,0)
 		_CullMode("Cull Mode", Float) = 2
 		_CutoutThreshold("Cutout Threshold", Range( 0 , 1)) = 0.5
@@ -259,7 +259,7 @@ Shader "Reflex Shader 2/Reflex Shader 2 Transparent"
 		uniform float _ShadowDarknessMin;
 		uniform float _Shadow2Place;
 		uniform sampler2D _ShadowMask;
-		uniform float _ForceEmissiveToogle;
+		uniform float _ForceEmissivetoggle;
 		uniform float _OutlineWidth;
 		uniform sampler2D _OutlineMask;
 		uniform float4 _OutlineColor;
@@ -402,7 +402,7 @@ Shader "Reflex Shader 2/Reflex Shader 2 Transparent"
 			float2 uv_EmissiveScrollMask466_g71 = i.uv_texcoord;
 			float4 tex2DNode466_g71 = tex2D( _EmissiveScrollMask, uv_EmissiveScrollMask466_g71 );
 			float4 EmissiveScrollMask508_g71 = tex2DNode466_g71;
-			float4 lerpResult451_g71 = lerp( saturate( ( ( RimLight233_g71 + Matcap260_g71 ) * MatcapShadow261_g71 * Lighting201_g71 * Shadow375_g71 ) ) , float4( 0,0,0,0 ) , lerp(float4( 0,0,0,0 ),EmissiveScrollMask508_g71,_ForceEmissiveToogle));
+			float4 lerpResult451_g71 = lerp( saturate( ( ( RimLight233_g71 + Matcap260_g71 ) * MatcapShadow261_g71 * Lighting201_g71 * Shadow375_g71 ) ) , float4( 0,0,0,0 ) , lerp(float4( 0,0,0,0 ),EmissiveScrollMask508_g71,_ForceEmissivetoggle));
 			c.rgb = lerpResult451_g71.rgb;
 			c.a = temp_output_84_0_g71.a;
 			return c;
