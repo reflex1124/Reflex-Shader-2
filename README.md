@@ -4,16 +4,18 @@
 This shader is made for VRChat.  
 このシェーダーはVRChatにおいて利用されることを前提に開発されています。
 
-## Reflex Shader 2.0について
-Reflex Shader 2.0はVRChat向けに開発されているアバター向けシェーダーです。  
+Version 2.1.1
+
+## Reflex Shader 2.1について
+Reflex Shader 2.1はVRChat向けに開発されているアバター向けシェーダーです。  
 特徴的な機能として以下のものがあります。
 - オブジェクトからの影に対応
 - 影色の自由な指定
 - Matcapやリムライトなどのリッチな表現
 - 色味や明るさはCubed's Unity Shaderに似ています
-- 各機能にマスクを入れる場所を用意してあるので、一部のみ機能を有効化することができます。
+- 各機能にマスクを入れる場所を用意してあるので、一部のみ機能を有効化することができます。
 - VRChatのSafety設定においてシェーダーが無効化されStandardになった場合もテクスチャが維持されます
-- ScanlineやEmissive Scrollなどの発光系の機能が豊富なので、Sci-Fi系のアバターに適しています
+- ScanlineやEmissive Scrollなどの発光系の機能が豊富なので、Sci-Fi系のアバターに適しています
 
 ## 導入方法
 UnitypackageをUnityからインポートしてください。
