@@ -9,17 +9,16 @@ Shader "Reflex Shader 2/Reflex Shader 2 Cutout"
 		_EmissionMap("Emission", 2D) = "black" {}
 		_EmissionColor("Emission Color", Color) = (1,1,1,1)
 		[Normal]_BumpMap("Normal Map", 2D) = "bump" {}
-		[Toggle(_MATCAPTOGGLE_ON)] _MatcapToggle("Matcap Toggle", Float) = 1
+		[Toggle]_MatcapToggle("Matcap Toggle", Float) = 1
 		_Matcap("Matcap", 2D) = "black" {}
 		_MatcapColor("Matcap Color", Color) = (1,1,1,1)
 		[Toggle]_MatcapShadowToggle("Matcap Shadow Toggle", Float) = 1
 		_MatcapShadow("Matcap Shadow", 2D) = "white" {}
 		_MatcapShadowColor("Matcap Shadow Color", Color) = (0.7843137,0.7843137,0.7843137,1)
-		[Toggle]_MatcapMaskToggle("Matcap Mask Toggle", Float) = 0
-		[NoScaleOffset]_MatcapMask("Matcap Mask", 2D) = "black" {}
+		[NoScaleOffset]_MatcapMask("Matcap Mask", 2D) = "white" {}
 		[Toggle]_ForceMatcap("Force Matcap", Float) = 0
 		[Toggle]_MatcapCameraFix("Matcap Camera Fix", Float) = 0
-		[Toggle(_RIMLIGHTTOGGLE_ON)] _RimLightToggle("RimLight Toggle", Float) = 1
+		[Toggle]_RimLightToggle("RimLight Toggle", Float) = 1
 		_RimLightColor("RimLight Color", Color) = (1,1,1,1)
 		_RimLightColorSampler("RimLight Color Sampler", 2D) = "white" {}
 		_RimLightPower("RimLight Power", Range( 0 , 1)) = 0
@@ -38,8 +37,8 @@ Shader "Reflex Shader 2/Reflex Shader 2 Cutout"
 		[Toggle]_FresnelToggle("Fresnel Toggle", Float) = 0
 		_FresnelPower("Fresnel Power", Range( 0 , 10)) = 9
 		_FresnelScale("Fresnel Scale", Range( 0 , 3)) = 3
-		[Toggle(_HALFLAMBERTTOGGLE_ON)] _HalfLambertToggle("Half Lambert Toggle", Float) = 1
-		[Toggle]_ObjectShadow("Object Shadow", Float) = 1
+		[Toggle]_HalfLambertToggle("Shadow Toggle", Float) = 1
+		[Toggle]_ObjectShadow("Use System Shadow", Float) = 1
 		_Shadow1Contrast("Shadow 1 Contrast", Range( 1 , 20)) = 10
 		[Toggle]_Shadow2ContrastToggle("Shadow 2 Contrast Toggle", Float) = 0
 		_Shadow2Contrast("Shadow 2 Contrast", Range( 1 , 20)) = 10
@@ -48,19 +47,18 @@ Shader "Reflex Shader 2/Reflex Shader 2 Cutout"
 		[Toggle]_ShadowColorDarken("Shadow Color Darken", Float) = 1
 		_Shadow1Place("Shadow 1 Place", Range( -1 , 1)) = 0
 		_Shadow2Place("Shadow 2 Place", Range( -1 , 1)) = 0.1
-		_ShadowDarknessMin("Shadow Darkness Min", Range( 0 , 1)) = 0
 		_AmbientMinimum("Ambient Minimum", Range( 0 , 1)) = 0
 		[Toggle]_PosterizeToggle("Posterize Toggle", Float) = 0
 		_NormalIntensity("Normal Intensity", Range( 0 , 1)) = 0.5
 		[NoScaleOffset]_ShadowMask("Shadow Mask", 2D) = "white" {}
 		_VDirLight("V Dir Light", Vector) = (0,0.6,1,0)
 		[Toggle]_LightIntensityShadowPos("Light Intensity Shadow Pos", Float) = 0
-		[Toggle(_COLORSHIFT_ON)] _ColorShift("Color Shift", Float) = 0
+		[Toggle]_ColorShift("Color Shift", Float) = 0
 		_H("H", Range( -1 , 1)) = 0
 		_S("S", Range( -1 , 1)) = 0
 		_V("V", Range( -1 , 1)) = 0
 		[Toggle]_GrayscaleColor("Grayscale Color", Float) = 0
-		[Toggle(_SCANLINETOGGLE_ON)] _ScanLineToggle("Scan Line Toggle", Float) = 0
+		[Toggle]_ScanLineToggle("Scan Line Toggle", Float) = 0
 		[NoScaleOffset]_ScanLineTex("Scan Line Mask", 2D) = "white" {}
 		_ScanLineColor("Scan Line Color", Color) = (0,0.710345,1,0)
 		[Toggle]_ScanLineColor2Toggle("Scan Line Color 2 Toggle", Float) = 0
@@ -101,124 +99,114 @@ Shader "Reflex Shader 2/Reflex Shader 2 Cutout"
 		void outlineVertexDataFunc( inout appdata_full v, out Input o )
 		{
 			UNITY_INITIALIZE_OUTPUT( Input, o );
-			float2 uv_OutlineMask389_g90 = v.texcoord;
-			float outlineVar = ( (0.0 + (_OutlineWidth - 0.0) * (0.002 - 0.0) / (1.0 - 0.0)) * tex2Dlod( _OutlineMask, float4( uv_OutlineMask389_g90, 0, 0.0) ) ).r;
+			float2 uv_OutlineMask389_g98 = v.texcoord;
+			float outlineVar = ( (0.0 + (_OutlineWidth - 0.0) * (0.002 - 0.0) / (1.0 - 0.0)) * tex2Dlod( _OutlineMask, float4( uv_OutlineMask389_g98, 0, 0.0) ) ).r;
 			v.vertex.xyz += ( v.normal * outlineVar );
 		}
 		inline half4 LightingOutline( SurfaceOutput s, half3 lightDir, half atten ) { return half4 ( 0,0,0,1); }
 		void outlineSurf( Input i, inout SurfaceOutput o )
 		{
 			float2 uv_MainTex = i.uv_texcoord * _MainTex_ST.xy + _MainTex_ST.zw;
-			float4 temp_output_84_0_g90 = ( tex2D( _MainTex, uv_MainTex ) * _DiffuseColor );
-			float4 DiffuseBase606_g90 = temp_output_84_0_g90;
-			float grayscale611_g90 = dot(DiffuseBase606_g90.rgb, float3(0.299,0.587,0.114));
-			float4 temp_cast_1 = (grayscale611_g90).xxxx;
-			float3 hsvTorgb595_g90 = RGBToHSV( lerp(DiffuseBase606_g90,temp_cast_1,_GrayscaleColor).rgb );
-			float3 hsvTorgb603_g90 = HSVToRGB( float3(( hsvTorgb595_g90.x + _H ),( hsvTorgb595_g90.y + _S ),( hsvTorgb595_g90.z + _V )) );
-			#ifdef _COLORSHIFT_ON
-				float4 staticSwitch604_g90 = float4( hsvTorgb603_g90 , 0.0 );
-			#else
-				float4 staticSwitch604_g90 = DiffuseBase606_g90;
-			#endif
-			float4 Diffuse105_g90 = staticSwitch604_g90;
-			float3 appendResult387_g90 = (float3(_OutlineColor.r , _OutlineColor.g , _OutlineColor.b));
-			float3 localFunction_ShadeSH9411_g90 = Function_ShadeSH9();
+			float4 temp_output_84_0_g98 = ( tex2D( _MainTex, uv_MainTex ) * _DiffuseColor );
+			float4 DiffuseBase606_g98 = temp_output_84_0_g98;
+			float grayscale611_g98 = dot(DiffuseBase606_g98.rgb, float3(0.299,0.587,0.114));
+			float4 temp_cast_1 = (grayscale611_g98).xxxx;
+			float3 hsvTorgb595_g98 = RGBToHSV( lerp(DiffuseBase606_g98,temp_cast_1,_GrayscaleColor).rgb );
+			float3 hsvTorgb603_g98 = HSVToRGB( float3(( hsvTorgb595_g98.x + _H ),( hsvTorgb595_g98.y + _S ),( hsvTorgb595_g98.z + _V )) );
+			float4 Diffuse105_g98 = lerp(DiffuseBase606_g98,float4( hsvTorgb603_g98 , 0.0 ),_ColorShift);
+			float3 appendResult387_g98 = (float3(_OutlineColor.r , _OutlineColor.g , _OutlineColor.b));
+			float3 localFunction_ShadeSH9411_g98 = Function_ShadeSH9();
 			#if defined(LIGHTMAP_ON) && UNITY_VERSION < 560 //aselc
 			float4 ase_lightColor = 0;
 			#else //aselc
 			float4 ase_lightColor = _LightColor0;
 			#endif //aselc
-			float4 ifLocalVar196_g90 = 0;
+			float4 ifLocalVar196_g98 = 0;
 			if( _WorldSpaceLightPos0.w <= 0.0 )
-				ifLocalVar196_g90 = ase_lightColor;
+				ifLocalVar196_g98 = ase_lightColor;
 			else
-				ifLocalVar196_g90 = ( 1 * ase_lightColor );
+				ifLocalVar196_g98 = ( 1 * ase_lightColor );
 			float4 temp_cast_6 = (_AmbientMinimum).xxxx;
-			float4 clampResult650_g90 = clamp( ( float4( localFunction_ShadeSH9411_g90 , 0.0 ) + ifLocalVar196_g90 ) , temp_cast_6 , float4( 1,1,1,0 ) );
+			float4 clampResult650_g98 = clamp( ( float4( localFunction_ShadeSH9411_g98 , 0.0 ) + ifLocalVar196_g98 ) , temp_cast_6 , float4( 1,1,1,0 ) );
 			float4 temp_cast_7 = (1.0).xxxx;
 			#ifdef _UNLIT_ON
-				float4 staticSwitch647_g90 = temp_cast_7;
+				float4 staticSwitch647_g98 = temp_cast_7;
 			#else
-				float4 staticSwitch647_g90 = saturate( clampResult650_g90 );
+				float4 staticSwitch647_g98 = saturate( clampResult650_g98 );
 			#endif
-			float4 Lighting201_g90 = staticSwitch647_g90;
+			float4 Lighting201_g98 = staticSwitch647_g98;
 			float4 temp_cast_8 = (1.0).xxxx;
-			float4 blendOpSrc365_g90 = _Shadow1Color;
-			float4 blendOpDest365_g90 = _Shadow2Color;
+			float4 blendOpSrc365_g98 = _Shadow1Color;
+			float4 blendOpDest365_g98 = _Shadow2Color;
 			float2 uv_BumpMap = i.uv_texcoord * _BumpMap_ST.xy + _BumpMap_ST.zw;
-			float3 tex2DNode207_g90 = UnpackNormal( tex2D( _BumpMap, uv_BumpMap ) );
-			float3 NormalMap208_g90 = tex2DNode207_g90;
-			float3 lerpResult333_g90 = lerp( float3( 0,0,1 ) , NormalMap208_g90 , _NormalIntensity);
-			float3 newWorldNormal334_g90 = (WorldNormalVector( i , lerpResult333_g90 ));
+			float3 tex2DNode207_g98 = UnpackNormal( tex2D( _BumpMap, uv_BumpMap ) );
+			float3 NormalMap208_g98 = tex2DNode207_g98;
+			float3 lerpResult333_g98 = lerp( float3( 0,0,1 ) , NormalMap208_g98 , _NormalIntensity);
+			float3 newWorldNormal334_g98 = (WorldNormalVector( i , lerpResult333_g98 ));
 			float3 ase_worldPos = i.worldPos;
 			#if defined(LIGHTMAP_ON) && UNITY_VERSION < 560 //aseld
 			float3 ase_worldlightDir = 0;
 			#else //aseld
 			float3 ase_worldlightDir = normalize( UnityWorldSpaceLightDir( ase_worldPos ) );
 			#endif //aseld
-			float dotResult5_g91 = dot( newWorldNormal334_g90 , ase_worldlightDir );
-			float temp_output_335_0_g90 = (dotResult5_g91*0.5 + 0.5);
-			float grayscale544_g90 = (ase_lightColor.rgb.r + ase_lightColor.rgb.g + ase_lightColor.rgb.b) / 3;
-			float3 localFunction_ShadeSH9567_g90 = Function_ShadeSH9();
-			float grayscale568_g90 = (localFunction_ShadeSH9567_g90.r + localFunction_ShadeSH9567_g90.g + localFunction_ShadeSH9567_g90.b) / 3;
-			float blendOpSrc566_g90 = grayscale544_g90;
-			float blendOpDest566_g90 = grayscale568_g90;
-			float4 transform434_g90 = mul(unity_ObjectToWorld,float4( _VDirLight , 0.0 ));
-			float dotResult441_g90 = dot( transform434_g90 , float4( newWorldNormal334_g90 , 0.0 ) );
-			float temp_output_538_0_g90 = ( ( dotResult441_g90 * 0.5 ) + 0.5 );
-			float ifLocalVar431_g90 = 0;
+			float dotResult5_g99 = dot( newWorldNormal334_g98 , ase_worldlightDir );
+			float temp_output_335_0_g98 = (dotResult5_g99*0.5 + 0.5);
+			float grayscale544_g98 = (ase_lightColor.rgb.r + ase_lightColor.rgb.g + ase_lightColor.rgb.b) / 3;
+			float3 localFunction_ShadeSH9567_g98 = Function_ShadeSH9();
+			float grayscale568_g98 = (localFunction_ShadeSH9567_g98.r + localFunction_ShadeSH9567_g98.g + localFunction_ShadeSH9567_g98.b) / 3;
+			float blendOpSrc566_g98 = grayscale544_g98;
+			float blendOpDest566_g98 = grayscale568_g98;
+			float4 transform434_g98 = mul(unity_ObjectToWorld,float4( _VDirLight , 0.0 ));
+			float dotResult441_g98 = dot( transform434_g98 , float4( newWorldNormal334_g98 , 0.0 ) );
+			float temp_output_538_0_g98 = ( ( dotResult441_g98 * 0.5 ) + 0.5 );
+			float ifLocalVar431_g98 = 0;
 			if( ase_lightColor.a <= 0.0 )
-				ifLocalVar431_g90 = temp_output_538_0_g90;
+				ifLocalVar431_g98 = temp_output_538_0_g98;
 			else
-				ifLocalVar431_g90 = lerp(lerp(temp_output_335_0_g90,saturate( ( temp_output_335_0_g90 * 1 ) ),_ObjectShadow),( ( saturate( 	max( blendOpSrc566_g90, blendOpDest566_g90 ) )) * lerp(temp_output_335_0_g90,saturate( ( temp_output_335_0_g90 * 1 ) ),_ObjectShadow) ),_LightIntensityShadowPos);
-			float3 VDirLight648_g90 = _VDirLight;
-			float4 transform617_g90 = mul(unity_ObjectToWorld,float4( VDirLight648_g90 , 0.0 ));
-			float3 lerpResult624_g90 = lerp( float3( 0,0,1 ) , NormalMap208_g90 , _NormalIntensity);
-			float dotResult613_g90 = dot( transform617_g90 , float4( (WorldNormalVector( i , lerpResult624_g90 )) , 0.0 ) );
-			float FixedShadow627_g90 = ( ( dotResult613_g90 * 0.5 ) + 0.5 );
+				ifLocalVar431_g98 = lerp(lerp(temp_output_335_0_g98,saturate( ( temp_output_335_0_g98 * 1 ) ),_ObjectShadow),( ( saturate( 	max( blendOpSrc566_g98, blendOpDest566_g98 ) )) * lerp(temp_output_335_0_g98,saturate( ( temp_output_335_0_g98 * 1 ) ),_ObjectShadow) ),_LightIntensityShadowPos);
+			float3 VDirLight648_g98 = _VDirLight;
+			float4 transform617_g98 = mul(unity_ObjectToWorld,float4( VDirLight648_g98 , 0.0 ));
+			float3 lerpResult624_g98 = lerp( float3( 0,0,1 ) , NormalMap208_g98 , _NormalIntensity);
+			float dotResult613_g98 = dot( transform617_g98 , float4( (WorldNormalVector( i , lerpResult624_g98 )) , 0.0 ) );
+			float FixedShadow627_g98 = ( ( dotResult613_g98 * 0.5 ) + 0.5 );
 			#ifdef _UNLIT_ON
-				float staticSwitch645_g90 = FixedShadow627_g90;
+				float staticSwitch645_g98 = FixedShadow627_g98;
 			#else
-				float staticSwitch645_g90 = ifLocalVar431_g90;
+				float staticSwitch645_g98 = ifLocalVar431_g98;
 			#endif
-			float temp_output_351_0_g90 = ( ( ( ( _Shadow1Place + staticSwitch645_g90 ) - 0.5 ) * _Shadow1Contrast ) + 0.5 );
-			float4 temp_cast_15 = (temp_output_351_0_g90).xxxx;
-			float div354_g90=256.0/float((int)255.0);
-			float4 posterize354_g90 = ( floor( temp_cast_15 * div354_g90 ) / div354_g90 );
-			float4 temp_cast_16 = (temp_output_351_0_g90).xxxx;
-			float4 ifLocalVar358_g90 = 0;
+			float temp_output_351_0_g98 = ( ( ( ( _Shadow1Place + staticSwitch645_g98 ) - 0.5 ) * _Shadow1Contrast ) + 0.5 );
+			float4 temp_cast_15 = (temp_output_351_0_g98).xxxx;
+			float div354_g98=256.0/float((int)255.0);
+			float4 posterize354_g98 = ( floor( temp_cast_15 * div354_g98 ) / div354_g98 );
+			float4 temp_cast_16 = (temp_output_351_0_g98).xxxx;
+			float4 ifLocalVar358_g98 = 0;
 			if( _PosterizeToggle >= 0.5 )
-				ifLocalVar358_g90 = posterize354_g90;
+				ifLocalVar358_g98 = posterize354_g98;
 			else
-				ifLocalVar358_g90 = temp_cast_16;
-			float4 temp_cast_17 = (_ShadowDarknessMin).xxxx;
+				ifLocalVar358_g98 = temp_cast_16;
+			float4 temp_cast_17 = (0.0).xxxx;
 			float4 temp_cast_18 = (1.0).xxxx;
-			float4 clampResult364_g90 = clamp( ifLocalVar358_g90 , temp_cast_17 , temp_cast_18 );
-			float4 lerpResult366_g90 = lerp( _Shadow1Color , float4( 1,1,1,0 ) , clampResult364_g90);
-			float temp_output_353_0_g90 = ( ( ( ( _Shadow2Place + staticSwitch645_g90 ) - 0.5 ) * lerp(_Shadow1Contrast,_Shadow2Contrast,_Shadow2ContrastToggle) ) + 0.5 );
-			float4 temp_cast_20 = (temp_output_353_0_g90).xxxx;
-			float div356_g90=256.0/float((int)255.0);
-			float4 posterize356_g90 = ( floor( temp_cast_20 * div356_g90 ) / div356_g90 );
-			float4 temp_cast_21 = (temp_output_353_0_g90).xxxx;
-			float4 ifLocalVar360_g90 = 0;
+			float4 clampResult364_g98 = clamp( ifLocalVar358_g98 , temp_cast_17 , temp_cast_18 );
+			float4 lerpResult366_g98 = lerp( _Shadow1Color , float4( 1,1,1,0 ) , clampResult364_g98);
+			float temp_output_353_0_g98 = ( ( ( ( _Shadow2Place + staticSwitch645_g98 ) - 0.5 ) * lerp(_Shadow1Contrast,_Shadow2Contrast,_Shadow2ContrastToggle) ) + 0.5 );
+			float4 temp_cast_20 = (temp_output_353_0_g98).xxxx;
+			float div356_g98=256.0/float((int)255.0);
+			float4 posterize356_g98 = ( floor( temp_cast_20 * div356_g98 ) / div356_g98 );
+			float4 temp_cast_21 = (temp_output_353_0_g98).xxxx;
+			float4 ifLocalVar360_g98 = 0;
 			if( _PosterizeToggle >= 0.5 )
-				ifLocalVar360_g90 = posterize356_g90;
+				ifLocalVar360_g98 = posterize356_g98;
 			else
-				ifLocalVar360_g90 = temp_cast_21;
-			float4 temp_cast_22 = (_ShadowDarknessMin).xxxx;
+				ifLocalVar360_g98 = temp_cast_21;
+			float4 temp_cast_22 = (0.0).xxxx;
 			float4 temp_cast_23 = (1.0).xxxx;
-			float4 clampResult363_g90 = clamp( ifLocalVar360_g90 , temp_cast_22 , temp_cast_23 );
-			float4 lerpResult368_g90 = lerp( lerp(_Shadow2Color,( saturate( min( blendOpSrc365_g90 , blendOpDest365_g90 ) )),_ShadowColorDarken) , lerpResult366_g90 , clampResult363_g90);
-			float2 uv_ShadowMask369_g90 = i.uv_texcoord;
-			float4 lerpResult372_g90 = lerp( float4( 1,1,1,1 ) , lerpResult368_g90 , tex2D( _ShadowMask, uv_ShadowMask369_g90 ));
-			#ifdef _HALFLAMBERTTOGGLE_ON
-				float4 staticSwitch540_g90 = lerpResult372_g90;
-			#else
-				float4 staticSwitch540_g90 = temp_cast_8;
-			#endif
-			float4 Shadow375_g90 = staticSwitch540_g90;
-			o.Emission = ( float4( ( (Diffuse105_g90).rgb * appendResult387_g90 ) , 0.0 ) * Lighting201_g90 * Shadow375_g90 ).rgb;
-			clip( lerp(0.0,(Diffuse105_g90).a,_OutlineToggle) - _CutoutThreshold );
+			float4 clampResult363_g98 = clamp( ifLocalVar360_g98 , temp_cast_22 , temp_cast_23 );
+			float4 lerpResult368_g98 = lerp( lerp(_Shadow2Color,( saturate( min( blendOpSrc365_g98 , blendOpDest365_g98 ) )),_ShadowColorDarken) , lerpResult366_g98 , clampResult363_g98);
+			float2 uv_ShadowMask369_g98 = i.uv_texcoord;
+			float4 lerpResult372_g98 = lerp( float4( 1,1,1,1 ) , lerpResult368_g98 , tex2D( _ShadowMask, uv_ShadowMask369_g98 ));
+			float4 Shadow375_g98 = lerp(temp_cast_8,lerpResult372_g98,_HalfLambertToggle);
+			o.Emission = ( float4( ( (Diffuse105_g98).rgb * appendResult387_g98 ) , 0.0 ) * Lighting201_g98 * Shadow375_g98 ).rgb;
+			clip( lerp(0.0,(Diffuse105_g98).a,_OutlineToggle) - _CutoutThreshold );
 			o.Normal = float3(0,0,-1);
 		}
 		ENDCG
@@ -234,12 +222,7 @@ Shader "Reflex Shader 2/Reflex Shader 2 Cutout"
 		#include "Lighting.cginc"
 		#pragma target 3.0
 		#pragma shader_feature _UNLIT_ON
-		#pragma shader_feature _SCANLINETOGGLE_ON
-		#pragma shader_feature _RIMLIGHTTOGGLE_ON
-		#pragma shader_feature _MATCAPTOGGLE_ON
-		#pragma shader_feature _COLORSHIFT_ON
 		#pragma shader_feature _REFLECTIONTOGGLE_ON
-		#pragma shader_feature _HALFLAMBERTTOGGLE_ON
 		#ifdef UNITY_PASS_SHADOWCASTER
 			#undef INTERNAL_DATA
 			#undef WorldReflectionVector
@@ -272,6 +255,7 @@ Shader "Reflex Shader 2/Reflex Shader 2 Cutout"
 
 		uniform float _CullMode;
 		uniform float _CutoutThreshold;
+		uniform float _ScanLineToggle;
 		uniform sampler2D _ScanLineTex;
 		uniform float _ScanLinePosition;
 		uniform float _ScanLineSpeed;
@@ -301,6 +285,7 @@ Shader "Reflex Shader 2/Reflex Shader 2 Cutout"
 		uniform sampler2D _MainTex;
 		uniform float4 _MainTex_ST;
 		uniform float4 _DiffuseColor;
+		uniform float _RimLightToggle;
 		uniform float _RimLightNormal;
 		uniform sampler2D _BumpMap;
 		uniform float4 _BumpMap_ST;
@@ -310,12 +295,13 @@ Shader "Reflex Shader 2/Reflex Shader 2 Cutout"
 		uniform sampler2D _RimLightColorSampler;
 		uniform float4 _RimLightColorSampler_ST;
 		uniform sampler2D _RimLightMask;
+		uniform float _MatcapToggle;
 		uniform sampler2D _Matcap;
 		uniform float _MatcapCameraFix;
 		uniform float4 _MatcapColor;
-		uniform float _MatcapMaskToggle;
 		uniform sampler2D _MatcapMask;
 		uniform float _ForceMatcap;
+		uniform float _ColorShift;
 		uniform float _GrayscaleColor;
 		uniform float _H;
 		uniform float _S;
@@ -331,6 +317,7 @@ Shader "Reflex Shader 2/Reflex Shader 2 Cutout"
 		uniform sampler2D _MatcapShadow;
 		uniform float4 _MatcapShadowColor;
 		uniform float _AmbientMinimum;
+		uniform float _HalfLambertToggle;
 		uniform float _ShadowColorDarken;
 		uniform float4 _Shadow2Color;
 		uniform float4 _Shadow1Color;
@@ -341,7 +328,6 @@ Shader "Reflex Shader 2/Reflex Shader 2 Cutout"
 		uniform float _NormalIntensity;
 		uniform float3 _VDirLight;
 		uniform float _Shadow1Contrast;
-		uniform float _ShadowDarknessMin;
 		uniform float _Shadow2Place;
 		uniform float _Shadow2ContrastToggle;
 		uniform float _Shadow2Contrast;
@@ -403,164 +389,145 @@ Shader "Reflex Shader 2/Reflex Shader 2 Cutout"
 			ase_lightAtten = UnityMixRealtimeAndBakedShadows(data.atten, bakedAtten, UnityComputeShadowFade(fadeDist));
 			#endif
 			float2 uv_MainTex = i.uv_texcoord * _MainTex_ST.xy + _MainTex_ST.zw;
-			float4 temp_output_84_0_g90 = ( tex2D( _MainTex, uv_MainTex ) * _DiffuseColor );
+			float4 temp_output_84_0_g98 = ( tex2D( _MainTex, uv_MainTex ) * _DiffuseColor );
 			float2 uv_BumpMap = i.uv_texcoord * _BumpMap_ST.xy + _BumpMap_ST.zw;
-			float3 tex2DNode207_g90 = UnpackNormal( tex2D( _BumpMap, uv_BumpMap ) );
+			float3 tex2DNode207_g98 = UnpackNormal( tex2D( _BumpMap, uv_BumpMap ) );
 			float3 ase_worldPos = i.worldPos;
 			float3 ase_worldViewDir = normalize( UnityWorldSpaceViewDir( ase_worldPos ) );
-			float dotResult214_g90 = dot( (WorldNormalVector( i , lerp(float3( 0,0,1 ),tex2DNode207_g90,_RimLightNormal) )) , ase_worldViewDir );
+			float dotResult214_g98 = dot( (WorldNormalVector( i , lerp(float3( 0,0,1 ),tex2DNode207_g98,_RimLightNormal) )) , ase_worldViewDir );
 			float2 uv_RimLightColorSampler = i.uv_texcoord * _RimLightColorSampler_ST.xy + _RimLightColorSampler_ST.zw;
-			float2 uv_RimLightMask225_g90 = i.uv_texcoord;
-			float4 lerpResult230_g90 = lerp( ( ( ( ( ( abs( ( 1.0 - dotResult214_g90 ) ) * _RimLightPower ) - 0.5 ) * _RimLightContrast ) + 0.5 ) * ( _RimLightColor * tex2D( _RimLightColorSampler, uv_RimLightColorSampler ) ) ) , float4( 0,0,0,0 ) , ( 1.0 - tex2D( _RimLightMask, uv_RimLightMask225_g90 ) ));
-			#ifdef _RIMLIGHTTOGGLE_ON
-				float4 staticSwitch552_g90 = lerpResult230_g90;
-			#else
-				float4 staticSwitch552_g90 = float4( 0,0,0,0 );
-			#endif
-			float4 RimLight233_g90 = saturate( staticSwitch552_g90 );
-			float3 NormalMap208_g90 = tex2DNode207_g90;
-			float3 temp_output_240_0_g90 = mul( UNITY_MATRIX_V, float4( (WorldNormalVector( i , NormalMap208_g90 )) , 0.0 ) ).xyz;
-			float3 worldToViewDir556_g90 = mul( UNITY_MATRIX_V, float4( ase_worldViewDir, 0 ) ).xyz;
-			float2 temp_output_244_0_g90 = ( 0.5 + ( 0.5 * lerp((temp_output_240_0_g90).xy,(BlendNormals( ( worldToViewDir556_g90 * float3(-1,-1,1) ) , temp_output_240_0_g90 )).xy,_MatcapCameraFix) ) );
-			float4 blendOpSrc251_g90 = tex2D( _Matcap, temp_output_244_0_g90 );
-			float4 blendOpDest251_g90 = _MatcapColor;
-			float2 uv_MatcapMask246_g90 = i.uv_texcoord;
-			float4 lerpResult254_g90 = lerp( float4( 0,0,0,0 ) , ( saturate( ( blendOpSrc251_g90 * blendOpDest251_g90 ) )) , lerp(float4( 1,1,1,1 ),tex2D( _MatcapMask, uv_MatcapMask246_g90 ),_MatcapMaskToggle));
-			#ifdef _MATCAPTOGGLE_ON
-				float4 staticSwitch553_g90 = lerpResult254_g90;
-			#else
-				float4 staticSwitch553_g90 = float4( 0,0,0,0 );
-			#endif
-			float4 DiffuseBase606_g90 = temp_output_84_0_g90;
-			float grayscale611_g90 = dot(DiffuseBase606_g90.rgb, float3(0.299,0.587,0.114));
-			float4 temp_cast_6 = (grayscale611_g90).xxxx;
-			float3 hsvTorgb595_g90 = RGBToHSV( lerp(DiffuseBase606_g90,temp_cast_6,_GrayscaleColor).rgb );
-			float3 hsvTorgb603_g90 = HSVToRGB( float3(( hsvTorgb595_g90.x + _H ),( hsvTorgb595_g90.y + _S ),( hsvTorgb595_g90.z + _V )) );
-			#ifdef _COLORSHIFT_ON
-				float4 staticSwitch604_g90 = float4( hsvTorgb603_g90 , 0.0 );
-			#else
-				float4 staticSwitch604_g90 = DiffuseBase606_g90;
-			#endif
-			float4 Diffuse105_g90 = staticSwitch604_g90;
-			float4 lerpResult252_g90 = lerp( Diffuse105_g90 , float4( 0,0,0,0 ) , lerp(float4( 1,1,1,1 ),tex2D( _MatcapMask, uv_MatcapMask246_g90 ),_MatcapMaskToggle));
-			float4 Matcap260_g90 = ( staticSwitch553_g90 + lerp(Diffuse105_g90,lerpResult252_g90,_ForceMatcap) );
-			float3 indirectNormal281_g90 = WorldNormalVector( i , NormalMap208_g90 );
-			Unity_GlossyEnvironmentData g281_g90 = UnityGlossyEnvironmentSetup( _Smoothness, data.worldViewDir, indirectNormal281_g90, float3(0,0,0));
-			float3 indirectSpecular281_g90 = UnityGI_IndirectSpecular( data, 1.0, indirectNormal281_g90, g281_g90 );
-			float2 uv_ReflectionMask268_g90 = i.uv_texcoord;
-			float4 lerpResult273_g90 = lerp( float4( 0,0,0,0 ) , ( float4( indirectSpecular281_g90 , 0.0 ) * _ReflectionColor ) , tex2D( _ReflectionMask, uv_ReflectionMask268_g90 ));
-			float4 lerpResult277_g90 = lerp( float4( 0,0,0,0 ) , lerpResult273_g90 , _ReflectionIntensity);
+			float2 uv_RimLightMask225_g98 = i.uv_texcoord;
+			float4 lerpResult230_g98 = lerp( ( ( ( ( ( abs( ( 1.0 - dotResult214_g98 ) ) * _RimLightPower ) - 0.5 ) * _RimLightContrast ) + 0.5 ) * ( _RimLightColor * tex2D( _RimLightColorSampler, uv_RimLightColorSampler ) ) ) , float4( 0,0,0,0 ) , ( 1.0 - tex2D( _RimLightMask, uv_RimLightMask225_g98 ) ));
+			float4 RimLight233_g98 = saturate( lerp(float4( 0,0,0,0 ),lerpResult230_g98,_RimLightToggle) );
+			float3 NormalMap208_g98 = tex2DNode207_g98;
+			float3 temp_output_240_0_g98 = mul( UNITY_MATRIX_V, float4( (WorldNormalVector( i , NormalMap208_g98 )) , 0.0 ) ).xyz;
+			float3 worldToViewDir556_g98 = mul( UNITY_MATRIX_V, float4( ase_worldViewDir, 0 ) ).xyz;
+			float2 temp_output_244_0_g98 = ( 0.5 + ( 0.5 * lerp((temp_output_240_0_g98).xy,(BlendNormals( ( worldToViewDir556_g98 * float3(-1,-1,1) ) , temp_output_240_0_g98 )).xy,_MatcapCameraFix) ) );
+			float4 blendOpSrc251_g98 = tex2D( _Matcap, temp_output_244_0_g98 );
+			float4 blendOpDest251_g98 = _MatcapColor;
+			float2 uv_MatcapMask246_g98 = i.uv_texcoord;
+			float4 tex2DNode246_g98 = tex2D( _MatcapMask, uv_MatcapMask246_g98 );
+			float4 lerpResult254_g98 = lerp( float4( 0,0,0,0 ) , ( saturate( ( blendOpSrc251_g98 * blendOpDest251_g98 ) )) , tex2DNode246_g98);
+			float4 DiffuseBase606_g98 = temp_output_84_0_g98;
+			float grayscale611_g98 = dot(DiffuseBase606_g98.rgb, float3(0.299,0.587,0.114));
+			float4 temp_cast_6 = (grayscale611_g98).xxxx;
+			float3 hsvTorgb595_g98 = RGBToHSV( lerp(DiffuseBase606_g98,temp_cast_6,_GrayscaleColor).rgb );
+			float3 hsvTorgb603_g98 = HSVToRGB( float3(( hsvTorgb595_g98.x + _H ),( hsvTorgb595_g98.y + _S ),( hsvTorgb595_g98.z + _V )) );
+			float4 Diffuse105_g98 = lerp(DiffuseBase606_g98,float4( hsvTorgb603_g98 , 0.0 ),_ColorShift);
+			float4 lerpResult252_g98 = lerp( Diffuse105_g98 , float4( 0,0,0,0 ) , tex2DNode246_g98);
+			float4 Matcap260_g98 = ( lerp(float4( 0,0,0,0 ),lerpResult254_g98,_MatcapToggle) + lerp(Diffuse105_g98,lerpResult252_g98,_ForceMatcap) );
+			float3 indirectNormal281_g98 = WorldNormalVector( i , NormalMap208_g98 );
+			Unity_GlossyEnvironmentData g281_g98 = UnityGlossyEnvironmentSetup( _Smoothness, data.worldViewDir, indirectNormal281_g98, float3(0,0,0));
+			float3 indirectSpecular281_g98 = UnityGI_IndirectSpecular( data, 1.0, indirectNormal281_g98, g281_g98 );
+			float2 uv_ReflectionMask268_g98 = i.uv_texcoord;
+			float4 lerpResult273_g98 = lerp( float4( 0,0,0,0 ) , ( float4( indirectSpecular281_g98 , 0.0 ) * _ReflectionColor ) , tex2D( _ReflectionMask, uv_ReflectionMask268_g98 ));
+			float4 lerpResult277_g98 = lerp( float4( 0,0,0,0 ) , lerpResult273_g98 , _ReflectionIntensity);
 			float3 ase_worldNormal = WorldNormalVector( i, float3( 0, 0, 1 ) );
-			float fresnelNdotV275_g90 = dot( ase_worldNormal, ase_worldViewDir );
-			float fresnelNode275_g90 = ( 0.0 + _FresnelScale * pow( 1.0 - fresnelNdotV275_g90, _FresnelPower ) );
-			float4 lerpResult278_g90 = lerp( float4( 0,0,0,0 ) , lerpResult277_g90 , lerp(1.0,fresnelNode275_g90,_FresnelToggle));
+			float fresnelNdotV275_g98 = dot( ase_worldNormal, ase_worldViewDir );
+			float fresnelNode275_g98 = ( 0.0 + _FresnelScale * pow( 1.0 - fresnelNdotV275_g98, _FresnelPower ) );
+			float4 lerpResult278_g98 = lerp( float4( 0,0,0,0 ) , lerpResult277_g98 , lerp(1.0,fresnelNode275_g98,_FresnelToggle));
 			#ifdef _REFLECTIONTOGGLE_ON
-				float4 staticSwitch549_g90 = lerpResult278_g90;
+				float4 staticSwitch549_g98 = lerpResult278_g98;
 			#else
-				float4 staticSwitch549_g90 = float4( 0,0,0,0 );
+				float4 staticSwitch549_g98 = float4( 0,0,0,0 );
 			#endif
-			float4 Reflection280_g90 = staticSwitch549_g90;
-			float4 blendOpSrc259_g90 = lerp(float4( 1,1,1,1 ),tex2D( _MatcapShadow, temp_output_244_0_g90 ),_MatcapShadowToggle);
-			float4 blendOpDest259_g90 = _MatcapShadowColor;
-			float4 MatcapShadow261_g90 = ( saturate( ( blendOpSrc259_g90 + blendOpDest259_g90 ) ));
-			float3 localFunction_ShadeSH9411_g90 = Function_ShadeSH9();
+			float4 Reflection280_g98 = staticSwitch549_g98;
+			float4 blendOpSrc259_g98 = lerp(float4( 1,1,1,1 ),tex2D( _MatcapShadow, temp_output_244_0_g98 ),_MatcapShadowToggle);
+			float4 blendOpDest259_g98 = _MatcapShadowColor;
+			float4 MatcapShadow261_g98 = ( saturate( ( blendOpSrc259_g98 + blendOpDest259_g98 ) ));
+			float3 localFunction_ShadeSH9411_g98 = Function_ShadeSH9();
 			#if defined(LIGHTMAP_ON) && UNITY_VERSION < 560 //aselc
 			float4 ase_lightColor = 0;
 			#else //aselc
 			float4 ase_lightColor = _LightColor0;
 			#endif //aselc
-			float4 ifLocalVar196_g90 = 0;
+			float4 ifLocalVar196_g98 = 0;
 			if( _WorldSpaceLightPos0.w <= 0.0 )
-				ifLocalVar196_g90 = ase_lightColor;
+				ifLocalVar196_g98 = ase_lightColor;
 			else
-				ifLocalVar196_g90 = ( ase_lightAtten * ase_lightColor );
+				ifLocalVar196_g98 = ( ase_lightAtten * ase_lightColor );
 			float4 temp_cast_11 = (_AmbientMinimum).xxxx;
-			float4 clampResult650_g90 = clamp( ( float4( localFunction_ShadeSH9411_g90 , 0.0 ) + ifLocalVar196_g90 ) , temp_cast_11 , float4( 1,1,1,0 ) );
+			float4 clampResult650_g98 = clamp( ( float4( localFunction_ShadeSH9411_g98 , 0.0 ) + ifLocalVar196_g98 ) , temp_cast_11 , float4( 1,1,1,0 ) );
 			float4 temp_cast_12 = (1.0).xxxx;
 			#ifdef _UNLIT_ON
-				float4 staticSwitch647_g90 = temp_cast_12;
+				float4 staticSwitch647_g98 = temp_cast_12;
 			#else
-				float4 staticSwitch647_g90 = saturate( clampResult650_g90 );
+				float4 staticSwitch647_g98 = saturate( clampResult650_g98 );
 			#endif
-			float4 Lighting201_g90 = staticSwitch647_g90;
+			float4 Lighting201_g98 = staticSwitch647_g98;
 			float4 temp_cast_13 = (1.0).xxxx;
-			float4 blendOpSrc365_g90 = _Shadow1Color;
-			float4 blendOpDest365_g90 = _Shadow2Color;
-			float3 lerpResult333_g90 = lerp( float3( 0,0,1 ) , NormalMap208_g90 , _NormalIntensity);
-			float3 newWorldNormal334_g90 = (WorldNormalVector( i , lerpResult333_g90 ));
+			float4 blendOpSrc365_g98 = _Shadow1Color;
+			float4 blendOpDest365_g98 = _Shadow2Color;
+			float3 lerpResult333_g98 = lerp( float3( 0,0,1 ) , NormalMap208_g98 , _NormalIntensity);
+			float3 newWorldNormal334_g98 = (WorldNormalVector( i , lerpResult333_g98 ));
 			#if defined(LIGHTMAP_ON) && UNITY_VERSION < 560 //aseld
 			float3 ase_worldlightDir = 0;
 			#else //aseld
 			float3 ase_worldlightDir = normalize( UnityWorldSpaceLightDir( ase_worldPos ) );
 			#endif //aseld
-			float dotResult5_g91 = dot( newWorldNormal334_g90 , ase_worldlightDir );
-			float temp_output_335_0_g90 = (dotResult5_g91*0.5 + 0.5);
-			float grayscale544_g90 = (ase_lightColor.rgb.r + ase_lightColor.rgb.g + ase_lightColor.rgb.b) / 3;
-			float3 localFunction_ShadeSH9567_g90 = Function_ShadeSH9();
-			float grayscale568_g90 = (localFunction_ShadeSH9567_g90.r + localFunction_ShadeSH9567_g90.g + localFunction_ShadeSH9567_g90.b) / 3;
-			float blendOpSrc566_g90 = grayscale544_g90;
-			float blendOpDest566_g90 = grayscale568_g90;
-			float4 transform434_g90 = mul(unity_ObjectToWorld,float4( _VDirLight , 0.0 ));
-			float dotResult441_g90 = dot( transform434_g90 , float4( newWorldNormal334_g90 , 0.0 ) );
-			float temp_output_538_0_g90 = ( ( dotResult441_g90 * 0.5 ) + 0.5 );
-			float ifLocalVar431_g90 = 0;
+			float dotResult5_g99 = dot( newWorldNormal334_g98 , ase_worldlightDir );
+			float temp_output_335_0_g98 = (dotResult5_g99*0.5 + 0.5);
+			float grayscale544_g98 = (ase_lightColor.rgb.r + ase_lightColor.rgb.g + ase_lightColor.rgb.b) / 3;
+			float3 localFunction_ShadeSH9567_g98 = Function_ShadeSH9();
+			float grayscale568_g98 = (localFunction_ShadeSH9567_g98.r + localFunction_ShadeSH9567_g98.g + localFunction_ShadeSH9567_g98.b) / 3;
+			float blendOpSrc566_g98 = grayscale544_g98;
+			float blendOpDest566_g98 = grayscale568_g98;
+			float4 transform434_g98 = mul(unity_ObjectToWorld,float4( _VDirLight , 0.0 ));
+			float dotResult441_g98 = dot( transform434_g98 , float4( newWorldNormal334_g98 , 0.0 ) );
+			float temp_output_538_0_g98 = ( ( dotResult441_g98 * 0.5 ) + 0.5 );
+			float ifLocalVar431_g98 = 0;
 			if( ase_lightColor.a <= 0.0 )
-				ifLocalVar431_g90 = temp_output_538_0_g90;
+				ifLocalVar431_g98 = temp_output_538_0_g98;
 			else
-				ifLocalVar431_g90 = lerp(lerp(temp_output_335_0_g90,saturate( ( temp_output_335_0_g90 * ase_lightAtten ) ),_ObjectShadow),( ( saturate( 	max( blendOpSrc566_g90, blendOpDest566_g90 ) )) * lerp(temp_output_335_0_g90,saturate( ( temp_output_335_0_g90 * ase_lightAtten ) ),_ObjectShadow) ),_LightIntensityShadowPos);
-			float3 VDirLight648_g90 = _VDirLight;
-			float4 transform617_g90 = mul(unity_ObjectToWorld,float4( VDirLight648_g90 , 0.0 ));
-			float3 lerpResult624_g90 = lerp( float3( 0,0,1 ) , NormalMap208_g90 , _NormalIntensity);
-			float dotResult613_g90 = dot( transform617_g90 , float4( (WorldNormalVector( i , lerpResult624_g90 )) , 0.0 ) );
-			float FixedShadow627_g90 = ( ( dotResult613_g90 * 0.5 ) + 0.5 );
+				ifLocalVar431_g98 = lerp(lerp(temp_output_335_0_g98,saturate( ( temp_output_335_0_g98 * ase_lightAtten ) ),_ObjectShadow),( ( saturate( 	max( blendOpSrc566_g98, blendOpDest566_g98 ) )) * lerp(temp_output_335_0_g98,saturate( ( temp_output_335_0_g98 * ase_lightAtten ) ),_ObjectShadow) ),_LightIntensityShadowPos);
+			float3 VDirLight648_g98 = _VDirLight;
+			float4 transform617_g98 = mul(unity_ObjectToWorld,float4( VDirLight648_g98 , 0.0 ));
+			float3 lerpResult624_g98 = lerp( float3( 0,0,1 ) , NormalMap208_g98 , _NormalIntensity);
+			float dotResult613_g98 = dot( transform617_g98 , float4( (WorldNormalVector( i , lerpResult624_g98 )) , 0.0 ) );
+			float FixedShadow627_g98 = ( ( dotResult613_g98 * 0.5 ) + 0.5 );
 			#ifdef _UNLIT_ON
-				float staticSwitch645_g90 = FixedShadow627_g90;
+				float staticSwitch645_g98 = FixedShadow627_g98;
 			#else
-				float staticSwitch645_g90 = ifLocalVar431_g90;
+				float staticSwitch645_g98 = ifLocalVar431_g98;
 			#endif
-			float temp_output_351_0_g90 = ( ( ( ( _Shadow1Place + staticSwitch645_g90 ) - 0.5 ) * _Shadow1Contrast ) + 0.5 );
-			float4 temp_cast_20 = (temp_output_351_0_g90).xxxx;
-			float div354_g90=256.0/float((int)255.0);
-			float4 posterize354_g90 = ( floor( temp_cast_20 * div354_g90 ) / div354_g90 );
-			float4 temp_cast_21 = (temp_output_351_0_g90).xxxx;
-			float4 ifLocalVar358_g90 = 0;
+			float temp_output_351_0_g98 = ( ( ( ( _Shadow1Place + staticSwitch645_g98 ) - 0.5 ) * _Shadow1Contrast ) + 0.5 );
+			float4 temp_cast_20 = (temp_output_351_0_g98).xxxx;
+			float div354_g98=256.0/float((int)255.0);
+			float4 posterize354_g98 = ( floor( temp_cast_20 * div354_g98 ) / div354_g98 );
+			float4 temp_cast_21 = (temp_output_351_0_g98).xxxx;
+			float4 ifLocalVar358_g98 = 0;
 			if( _PosterizeToggle >= 0.5 )
-				ifLocalVar358_g90 = posterize354_g90;
+				ifLocalVar358_g98 = posterize354_g98;
 			else
-				ifLocalVar358_g90 = temp_cast_21;
-			float4 temp_cast_22 = (_ShadowDarknessMin).xxxx;
+				ifLocalVar358_g98 = temp_cast_21;
+			float4 temp_cast_22 = (0.0).xxxx;
 			float4 temp_cast_23 = (1.0).xxxx;
-			float4 clampResult364_g90 = clamp( ifLocalVar358_g90 , temp_cast_22 , temp_cast_23 );
-			float4 lerpResult366_g90 = lerp( _Shadow1Color , float4( 1,1,1,0 ) , clampResult364_g90);
-			float temp_output_353_0_g90 = ( ( ( ( _Shadow2Place + staticSwitch645_g90 ) - 0.5 ) * lerp(_Shadow1Contrast,_Shadow2Contrast,_Shadow2ContrastToggle) ) + 0.5 );
-			float4 temp_cast_25 = (temp_output_353_0_g90).xxxx;
-			float div356_g90=256.0/float((int)255.0);
-			float4 posterize356_g90 = ( floor( temp_cast_25 * div356_g90 ) / div356_g90 );
-			float4 temp_cast_26 = (temp_output_353_0_g90).xxxx;
-			float4 ifLocalVar360_g90 = 0;
+			float4 clampResult364_g98 = clamp( ifLocalVar358_g98 , temp_cast_22 , temp_cast_23 );
+			float4 lerpResult366_g98 = lerp( _Shadow1Color , float4( 1,1,1,0 ) , clampResult364_g98);
+			float temp_output_353_0_g98 = ( ( ( ( _Shadow2Place + staticSwitch645_g98 ) - 0.5 ) * lerp(_Shadow1Contrast,_Shadow2Contrast,_Shadow2ContrastToggle) ) + 0.5 );
+			float4 temp_cast_25 = (temp_output_353_0_g98).xxxx;
+			float div356_g98=256.0/float((int)255.0);
+			float4 posterize356_g98 = ( floor( temp_cast_25 * div356_g98 ) / div356_g98 );
+			float4 temp_cast_26 = (temp_output_353_0_g98).xxxx;
+			float4 ifLocalVar360_g98 = 0;
 			if( _PosterizeToggle >= 0.5 )
-				ifLocalVar360_g90 = posterize356_g90;
+				ifLocalVar360_g98 = posterize356_g98;
 			else
-				ifLocalVar360_g90 = temp_cast_26;
-			float4 temp_cast_27 = (_ShadowDarknessMin).xxxx;
+				ifLocalVar360_g98 = temp_cast_26;
+			float4 temp_cast_27 = (0.0).xxxx;
 			float4 temp_cast_28 = (1.0).xxxx;
-			float4 clampResult363_g90 = clamp( ifLocalVar360_g90 , temp_cast_27 , temp_cast_28 );
-			float4 lerpResult368_g90 = lerp( lerp(_Shadow2Color,( saturate( min( blendOpSrc365_g90 , blendOpDest365_g90 ) )),_ShadowColorDarken) , lerpResult366_g90 , clampResult363_g90);
-			float2 uv_ShadowMask369_g90 = i.uv_texcoord;
-			float4 lerpResult372_g90 = lerp( float4( 1,1,1,1 ) , lerpResult368_g90 , tex2D( _ShadowMask, uv_ShadowMask369_g90 ));
-			#ifdef _HALFLAMBERTTOGGLE_ON
-				float4 staticSwitch540_g90 = lerpResult372_g90;
-			#else
-				float4 staticSwitch540_g90 = temp_cast_13;
-			#endif
-			float4 Shadow375_g90 = staticSwitch540_g90;
-			float2 uv_EmissiveScrollMask466_g90 = i.uv_texcoord;
-			float4 tex2DNode466_g90 = tex2D( _EmissiveScrollMask, uv_EmissiveScrollMask466_g90 );
-			float4 EmissiveScrollMask508_g90 = tex2DNode466_g90;
-			float4 lerpResult451_g90 = lerp( saturate( ( ( RimLight233_g90 + Matcap260_g90 + Reflection280_g90 ) * MatcapShadow261_g90 * Lighting201_g90 * Shadow375_g90 ) ) , float4( 0,0,0,0 ) , lerp(float4( 0,0,0,0 ),EmissiveScrollMask508_g90,_ForceEmissiveToggle));
-			c.rgb = lerpResult451_g90.rgb;
+			float4 clampResult363_g98 = clamp( ifLocalVar360_g98 , temp_cast_27 , temp_cast_28 );
+			float4 lerpResult368_g98 = lerp( lerp(_Shadow2Color,( saturate( min( blendOpSrc365_g98 , blendOpDest365_g98 ) )),_ShadowColorDarken) , lerpResult366_g98 , clampResult363_g98);
+			float2 uv_ShadowMask369_g98 = i.uv_texcoord;
+			float4 lerpResult372_g98 = lerp( float4( 1,1,1,1 ) , lerpResult368_g98 , tex2D( _ShadowMask, uv_ShadowMask369_g98 ));
+			float4 Shadow375_g98 = lerp(temp_cast_13,lerpResult372_g98,_HalfLambertToggle);
+			float2 uv_EmissiveScrollMask466_g98 = i.uv_texcoord;
+			float4 tex2DNode466_g98 = tex2D( _EmissiveScrollMask, uv_EmissiveScrollMask466_g98 );
+			float4 EmissiveScrollMask508_g98 = tex2DNode466_g98;
+			float4 lerpResult451_g98 = lerp( saturate( ( ( RimLight233_g98 + Matcap260_g98 + Reflection280_g98 ) * MatcapShadow261_g98 * Lighting201_g98 * Shadow375_g98 ) ) , float4( 0,0,0,0 ) , lerp(float4( 0,0,0,0 ),EmissiveScrollMask508_g98,_ForceEmissiveToggle));
+			c.rgb = lerpResult451_g98.rgb;
 			c.a = 1;
-			clip( temp_output_84_0_g90.a - _CutoutThreshold );
+			clip( temp_output_84_0_g98.a - _CutoutThreshold );
 			return c;
 		}
 
@@ -573,32 +540,28 @@ Shader "Reflex Shader 2/Reflex Shader 2 Cutout"
 		{
 			o.SurfInput = i;
 			o.Normal = float3(0,0,1);
-			float2 uv_ScanLineTex526_g90 = i.uv_texcoord;
+			float2 uv_ScanLineTex526_g98 = i.uv_texcoord;
 			float3 ase_worldPos = i.worldPos;
-			float3 worldToObj529_g90 = mul( unity_WorldToObject, float4( ase_worldPos, 1 ) ).xyz;
-			float4 lerpResult513_g90 = lerp( float4( 0,0,0,0 ) , tex2D( _ScanLineTex, uv_ScanLineTex526_g90 ) ,  ( ( worldToObj529_g90.y + _ScanLinePosition ) - (0.0 + (_ScanLineWidth - 0.0) * (0.1 - 0.0) / (1.0 - 0.0)) > ( (0.0 + (frac( ( ( _Time.y / 3.0 ) * _ScanLineSpeed ) ) - 0.0) * (2.0 - 0.0) / (1.0 - 0.0)) - 1.0 ) ? 0.0 : ( worldToObj529_g90.y + _ScanLinePosition ) - (0.0 + (_ScanLineWidth - 0.0) * (0.1 - 0.0) / (1.0 - 0.0)) <= ( (0.0 + (frac( ( ( _Time.y / 3.0 ) * _ScanLineSpeed ) ) - 0.0) * (2.0 - 0.0) / (1.0 - 0.0)) - 1.0 ) && ( worldToObj529_g90.y + _ScanLinePosition ) + (0.0 + (_ScanLineWidth - 0.0) * (0.1 - 0.0) / (1.0 - 0.0)) >= ( (0.0 + (frac( ( ( _Time.y / 3.0 ) * _ScanLineSpeed ) ) - 0.0) * (2.0 - 0.0) / (1.0 - 0.0)) - 1.0 ) ? 1.0 : 0.0 ) );
-			float mulTime583_g90 = _Time.y * _Color2ChangeSpeed;
-			float4 lerpResult578_g90 = lerp( _ScanLineColor , _ScanLineColor2 , sin( mulTime583_g90 ));
-			#ifdef _SCANLINETOGGLE_ON
-				float4 staticSwitch551_g90 = ( lerpResult513_g90 * lerp(_ScanLineColor,lerpResult578_g90,_ScanLineColor2Toggle) );
-			#else
-				float4 staticSwitch551_g90 = float4( 0,0,0,0 );
-			#endif
-			float4 ScanLineEmission534_g90 = staticSwitch551_g90;
+			float3 worldToObj529_g98 = mul( unity_WorldToObject, float4( ase_worldPos, 1 ) ).xyz;
+			float4 lerpResult513_g98 = lerp( float4( 0,0,0,0 ) , tex2D( _ScanLineTex, uv_ScanLineTex526_g98 ) ,  ( ( worldToObj529_g98.y + _ScanLinePosition ) - (0.0 + (_ScanLineWidth - 0.0) * (0.1 - 0.0) / (1.0 - 0.0)) > ( (0.0 + (frac( ( ( _Time.y / 3.0 ) * _ScanLineSpeed ) ) - 0.0) * (2.0 - 0.0) / (1.0 - 0.0)) - 1.0 ) ? 0.0 : ( worldToObj529_g98.y + _ScanLinePosition ) - (0.0 + (_ScanLineWidth - 0.0) * (0.1 - 0.0) / (1.0 - 0.0)) <= ( (0.0 + (frac( ( ( _Time.y / 3.0 ) * _ScanLineSpeed ) ) - 0.0) * (2.0 - 0.0) / (1.0 - 0.0)) - 1.0 ) && ( worldToObj529_g98.y + _ScanLinePosition ) + (0.0 + (_ScanLineWidth - 0.0) * (0.1 - 0.0) / (1.0 - 0.0)) >= ( (0.0 + (frac( ( ( _Time.y / 3.0 ) * _ScanLineSpeed ) ) - 0.0) * (2.0 - 0.0) / (1.0 - 0.0)) - 1.0 ) ? 1.0 : 0.0 ) );
+			float mulTime583_g98 = _Time.y * _Color2ChangeSpeed;
+			float4 lerpResult578_g98 = lerp( _ScanLineColor , _ScanLineColor2 , sin( mulTime583_g98 ));
+			float4 temp_output_512_0_g98 = ( lerpResult513_g98 * lerp(_ScanLineColor,lerpResult578_g98,_ScanLineColor2Toggle) );
+			float4 ScanLineEmission534_g98 = lerp(float4( 0,0,0,0 ),temp_output_512_0_g98,_ScanLineToggle);
 			float2 uv_EmissionMap = i.uv_texcoord * _EmissionMap_ST.xy + _EmissionMap_ST.zw;
-			float2 uv_TexCoord485_g90 = i.uv_texcoord * _EmissiveScrollTiling + ( _Time.x * _EmissiveScrollSpeed );
-			float2 uv_EmissiveScrollMask466_g90 = i.uv_texcoord;
-			float4 tex2DNode466_g90 = tex2D( _EmissiveScrollMask, uv_EmissiveScrollMask466_g90 );
-			float4 lerpResult468_g90 = lerp( float4( 0,0,0,0 ) , tex2D( _EmissiveScrollTex, uv_TexCoord485_g90 ) , tex2DNode466_g90);
-			float2 ScrollDir469_g90 = _EmissiveScrollSpeed;
-			float dotResult461_g90 = dot( i.uv_texcoord , ScrollDir469_g90 );
-			float4 lerpResult504_g90 = lerp( float4( 0,0,0,0 ) , ( _EmissiveScrollColor * ( 1.0 - saturate( ( ( ( ( ( cos( ( UNITY_PI * ( ( dotResult461_g90 + _Time.y ) * ScrollDir469_g90 ) ) ).x + 0.0 ) + _EmissiveScrollStrength ) - 0.5 ) * _EmissiveScrollContrast ) + 0.5 ) ) ) ) , tex2DNode466_g90);
-			float4 EmissiveScroll507_g90 = saturate( lerp(( lerpResult468_g90 * _EmissiveScrollColor ),lerpResult504_g90,_EmissiveScrollGradient) );
-			float2 uv_TexCoord574_g90 = i.uv_texcoord * _ParallaxTiling;
-			float2 Offset573_g90 = ( ( _ParallaxHight - 1 ) * i.viewDir.xy * _ParallaxScale ) + uv_TexCoord574_g90;
+			float2 uv_TexCoord485_g98 = i.uv_texcoord * _EmissiveScrollTiling + ( _Time.x * _EmissiveScrollSpeed );
+			float2 uv_EmissiveScrollMask466_g98 = i.uv_texcoord;
+			float4 tex2DNode466_g98 = tex2D( _EmissiveScrollMask, uv_EmissiveScrollMask466_g98 );
+			float4 lerpResult468_g98 = lerp( float4( 0,0,0,0 ) , tex2D( _EmissiveScrollTex, uv_TexCoord485_g98 ) , tex2DNode466_g98);
+			float2 ScrollDir469_g98 = _EmissiveScrollSpeed;
+			float dotResult461_g98 = dot( i.uv_texcoord , ScrollDir469_g98 );
+			float4 lerpResult504_g98 = lerp( float4( 0,0,0,0 ) , ( _EmissiveScrollColor * ( 1.0 - saturate( ( ( ( ( ( cos( ( UNITY_PI * ( ( dotResult461_g98 + _Time.y ) * ScrollDir469_g98 ) ) ).x + 0.0 ) + _EmissiveScrollStrength ) - 0.5 ) * _EmissiveScrollContrast ) + 0.5 ) ) ) ) , tex2DNode466_g98);
+			float4 EmissiveScroll507_g98 = saturate( lerp(( lerpResult468_g98 * _EmissiveScrollColor ),lerpResult504_g98,_EmissiveScrollGradient) );
+			float2 uv_TexCoord574_g98 = i.uv_texcoord * _ParallaxTiling;
+			float2 Offset573_g98 = ( ( _ParallaxHight - 1 ) * i.viewDir.xy * _ParallaxScale ) + uv_TexCoord574_g98;
 			float2 uv_ParallaxMask = i.uv_texcoord * _ParallaxMask_ST.xy + _ParallaxMask_ST.zw;
-			float4 lerpResult588_g90 = lerp( float4( 0,0,0,0 ) , tex2D( _ParallaxEmission, Offset573_g90 ) , tex2D( _ParallaxMask, uv_ParallaxMask ));
-			o.Emission = ( ScanLineEmission534_g90 + ( tex2D( _EmissionMap, uv_EmissionMap ) * _EmissionColor ) + lerp(float4( 0,0,0,0 ),EmissiveScroll507_g90,_EmissiveScrollToggle) + lerpResult588_g90 ).rgb;
+			float4 lerpResult588_g98 = lerp( float4( 0,0,0,0 ) , tex2D( _ParallaxEmission, Offset573_g98 ) , tex2D( _ParallaxMask, uv_ParallaxMask ));
+			o.Emission = ( ScanLineEmission534_g98 + ( tex2D( _EmissionMap, uv_EmissionMap ) * _EmissionColor ) + lerp(float4( 0,0,0,0 ),EmissiveScroll507_g98,_EmissiveScrollToggle) + lerpResult588_g98 ).rgb;
 		}
 
 		ENDCG
@@ -691,20 +654,20 @@ Shader "Reflex Shader 2/Reflex Shader 2 Cutout"
 }
 /*ASEBEGIN
 Version=15900
--24;94;1906;1014;1333.856;639.0682;1.202612;True;False
-Node;AmplifyShaderEditor.FunctionNode;100;-411.4024,126.0497;Float;False;Reflex Shader Function;0;;90;f5d8f584674c8984ab029c8868eb5bf3;0;0;6;COLOR;186;FLOAT;265;COLOR;0;COLOR;402;FLOAT;403;COLOR;404
+702;92;1218;936;1026.589;592.1663;1.202612;True;False
 Node;AmplifyShaderEditor.CommentaryNode;46;338.6193,-381.5405;Float;False;361.0041;347.572;Properties;3;98;48;47;Miscellaneous;0.5514706,0.5514706,0.5514706,1;0;0
-Node;AmplifyShaderEditor.RangedFloatNode;48;376.6192,-309.541;Float;False;Property;_CullMode;Cull Mode;84;1;[Enum];Create;True;0;1;UnityEngine.Rendering.CullMode;True;0;2;0;0;0;0;1;FLOAT;0
+Node;AmplifyShaderEditor.FunctionNode;104;-411.4024,126.0497;Float;False;Reflex Shader Function;0;;98;f5d8f584674c8984ab029c8868eb5bf3;0;0;6;COLOR;186;FLOAT;265;COLOR;0;COLOR;402;FLOAT;403;COLOR;404
+Node;AmplifyShaderEditor.RangedFloatNode;47;378.3102,-222.1641;Float;False;Property;_CutoutThreshold;Cutout Threshold;89;0;Create;True;0;0;True;0;0.5;0.5;0;1;0;1;FLOAT;0
+Node;AmplifyShaderEditor.StaticSwitch;98;373.2518,-139.9842;Float;False;Property;_Unlit;Unlit;87;0;Create;True;0;0;True;0;0;0;0;True;;Toggle;2;Key0;Key1;9;1;FLOAT;0;False;0;FLOAT;0;False;2;FLOAT;0;False;3;FLOAT;0;False;4;FLOAT;0;False;5;FLOAT;0;False;6;FLOAT;0;False;7;FLOAT;0;False;8;FLOAT;0;False;1;FLOAT;0
 Node;AmplifyShaderEditor.OutlineNode;31;-7.553241,256.6598;Float;False;0;True;Masked;0;0;Front;3;0;FLOAT3;0,0,0;False;2;FLOAT;0;False;1;FLOAT;0;False;1;FLOAT3;0
-Node;AmplifyShaderEditor.RangedFloatNode;47;378.3102,-222.1641;Float;False;Property;_CutoutThreshold;Cutout Threshold;85;0;Create;True;0;0;True;0;0.5;0.5;0;1;0;1;FLOAT;0
-Node;AmplifyShaderEditor.StaticSwitch;98;373.2518,-139.9842;Float;False;Property;_Unlit;Unlit;83;0;Create;True;0;0;True;0;0;0;0;True;;Toggle;2;Key0;Key1;9;1;FLOAT;0;False;0;FLOAT;0;False;2;FLOAT;0;False;3;FLOAT;0;False;4;FLOAT;0;False;5;FLOAT;0;False;6;FLOAT;0;False;7;FLOAT;0;False;8;FLOAT;0;False;1;FLOAT;0
+Node;AmplifyShaderEditor.RangedFloatNode;48;376.6192,-309.541;Float;False;Property;_CullMode;Cull Mode;88;1;[Enum];Create;True;0;1;UnityEngine.Rendering.CullMode;True;0;2;0;0;0;0;1;FLOAT;0
 Node;AmplifyShaderEditor.StandardSurfaceOutputNode;0;324,-10;Float;False;True;2;Float;;0;0;CustomLighting;Reflex Shader 2/Reflex Shader 2 Cutout;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;Back;0;False;-1;0;False;-1;False;0;False;-1;0;False;-1;False;0;Masked;0.5;True;True;0;False;TransparentCutout;;AlphaTest;ForwardOnly;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;0;False;-1;False;0;False;-1;255;False;-1;255;False;-1;0;False;-1;0;False;-1;0;False;-1;0;False;-1;0;False;-1;0;False;-1;0;False;-1;0;False;-1;False;2;15;10;25;False;0.5;True;0;0;False;-1;0;False;-1;0;0;False;-1;0;False;-1;0;False;-1;0;False;-1;0;False;0;0,0,0,0;VertexOffset;True;False;Cylindrical;False;Relative;0;;-1;-1;-1;-1;0;False;0;0;True;48;-1;0;True;47;0;0;0;15;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0,0,0;False;4;FLOAT;0;False;6;FLOAT3;0,0,0;False;7;FLOAT3;0,0,0;False;8;FLOAT;0;False;9;FLOAT;0;False;10;FLOAT;0;False;13;FLOAT3;0,0,0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;14;FLOAT4;0,0,0,0;False;15;FLOAT3;0,0,0;False;0
-WireConnection;31;0;100;402
-WireConnection;31;2;100;403
-WireConnection;31;1;100;404
-WireConnection;0;2;100;186
-WireConnection;0;10;100;265
-WireConnection;0;13;100;0
+WireConnection;31;0;104;402
+WireConnection;31;2;104;403
+WireConnection;31;1;104;404
+WireConnection;0;2;104;186
+WireConnection;0;10;104;265
+WireConnection;0;13;104;0
 WireConnection;0;11;31;0
 ASEEND*/
-//CHKSM=8190C0DFB1FF7DF8FFB75050489286AFF179A950
+//CHKSM=4FDDEE24B257AAFC40D6BAB30D458A59A54F36EC

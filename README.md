@@ -4,7 +4,7 @@
 This shader is made for VRChat.  
 このシェーダーはVRChatにおいて利用されることを前提に開発されています。
 
-Version 2.1.1
+Version 2.1.2
 
 ## Reflex Shader 2.1について
 Reflex Shader 2.1はVRChat向けに開発されているアバター向けシェーダーです。  
