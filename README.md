@@ -13,9 +13,9 @@ Reflex Shader 2.2はVRChat向けに開発されているアバター向けシェ
 - 影色の自由な指定
 - Matcapやリムライトなどのリッチな表現
 - 色味や明るさはCubed's Unity Shaderに似ています
-- 各機能にマスクを入れる場所を用意してあるので、一部のみ機能を有効化することができます。
+- 各機能にマスクを入れる場所を用意してあるので、一部のみ機能を有効化することができます。
 - VRChatのSafety設定においてシェーダーが無効化されStandardになった場合もテクスチャが維持されます
-- ScanlineやEmissive Scrollなどの発光系の機能が豊富なので、Sci-Fi系のアバターに適しています
+- ScanlineやEmissive Scrollなどの発光系の機能が豊富なので、Sci-Fi系のアバターに適しています
 
 ## 導入方法
 UnitypackageをUnityからインポートしてください。
