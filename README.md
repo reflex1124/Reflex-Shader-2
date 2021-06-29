@@ -1,6 +1,6 @@
-
-
 # Reflex Shader 2
+[![release](https://img.shields.io/github/v/release/reflex1124/Reflex-Shader-2.svg?&style=for-the-badge)](https://github.com/reflex1124/Reflex-Shader-2/releases/latest)
+[![lisence](https://img.shields.io/badge/license-MIT-green.svg?logo=&style=for-the-badge)](https://opensource.org/licenses/mit-license.php)
 [![unity version](https://img.shields.io/badge/Unity-2018.4.20.f1-blue.svg?logo=unity&style=for-the-badge)](https://unity3d.com/jp/unity/whats-new/2018.4.20)
 [![VRChat](https://img.shields.io/badge/-VRChat-blue.svg?logo=&style=for-the-badge)](https://vrchat.com/)
 
