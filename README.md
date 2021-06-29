@@ -1,6 +1,11 @@
-![Header](Images/RS_Header.png)
+
 
 # Reflex Shader 2
+[![unity version](https://img.shields.io/badge/Unity-2018.4.20.f1-blue.svg?logo=unity&style=for-the-badge)](https://unity3d.com/jp/unity/whats-new/2018.4.20)
+[![VRChat](https://img.shields.io/badge/-VRChat-blue.svg?logo=&style=for-the-badge)](https://vrchat.com/)
+
+![Header](Images/RS_Header.png)
+
 This shader is made for VRChat.  
 このシェーダーはVRChatにおいて利用されることを前提に開発されています。
 
